@@ -1,7 +1,9 @@
 <?php
 
-class Sugerencias extends Service
-{
+class Sugerencias extends Service{
+	private $CREDITS_X_APPROVED = 5;
+	private $CREDITS_X_VOTE = 0.5;
+	private $MAX_VOTES_X_USER = 5;
 	/**
 	 * Function executed when the service is called
 	 *
@@ -17,7 +19,7 @@ class Sugerencias extends Service
 		if (empty($request->query)){
 			// get list of tickets
 			$connection = new Connection();
-			$result = $connection->deepQuery("SELECT id, user, subject, body, likes_count, creation_date, limit_date FROM feedback_tickets WHERE status = 'NEW' ORDER BY creation_date DESC");
+			$result = $connection->deepQuery("SELECT id, user, subject, body, likes_count, limit_votes, creation_date, limit_date FROM feedback_tickets WHERE status = 'NEW' ORDER BY creation_date DESC");
 
 			$tickets = array();
 
@@ -64,6 +66,7 @@ class Sugerencias extends Service
 			}
 		}
 
+		$this->checkApprovedFedbacks();
 		// return
 		return $response;
 	}
@@ -74,29 +77,28 @@ class Sugerencias extends Service
 	private function createFeedback(Request $request){
 		// insert ticket and delete tickets out of limit
 		$connection = new Connection();
-		$uniqueFeedback = $this->uniqueFeedback($request->email);
+		//$uniqueFeedback = $this->uniqueFeedback($request->email);
 		$response = new Response();
 
-		if($uniqueFeedback){	
+		//if($uniqueFeedback){	
 			$fecha = new DateTime();
 			$fechaNow = new DateTime();
 			$fechaLimite = $fecha->modify('+15 days');
-			
+			$limitVotes = $this->getLimitVotes();
+
 			$connection->deepQuery("
-				INSERT INTO `feedback_tickets` (`user`, `subject`, `body`, `limit_date`) 
-				VALUES ('{$request->email}', 'FeedBack from {$request->email}', '{$request->query}', '{$fechaLimite->format('Y-m-d H:i:s')}'); DELETE FROM `feedback_tickets` WHERE limit_date <= '{$fechaNow->format('Y-m-d H:i:s')}' AND likes_count < 100;");
-			//para colocar en estado descartado en vez de borrar:
-			//UPDATE `feedback_tickets` SET status = 'DISCARDED' WHERE limit_date <= '{$fechaNow->format('Y-m-d H:i:s')}' AND likes_count < 100;
+				INSERT INTO `feedback_tickets` (`user`, `subject`, `body`, `limit_votes`, `limit_date`) 
+				VALUES ('{$request->email}', 'FeedBack from {$request->email}', '{$request->query}', {$limitVotes},'{$fechaLimite->format('Y-m-d H:i:s')}'); DELETE FROM `feedback_tickets` WHERE limit_date <= '{$fechaNow->format('Y-m-d H:i:s')}' AND likes_count < {$limitVotes};");
 
 			// create response
 			$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya est&aacute; visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario(incluido t&uacute;) podr&aacute; votar por ella s&oacute;lo una vez, y si llega a sumar 100 votos o m&aacute;s en un plazo de 15 d&iacute;as, ser&aacute; aprobada, si no, se descartar&aacute; y t&uacute; podr&aacute;s enviar otra sugerencia.";
 			$response->setResponseSubject("Sugerencia enviada");
-			$response->createFromTemplate("success.tpl", array("titulo"=>"sugerencia enviada", "mensaje"=>$mensaje));
-		}else{
+			$response->createFromTemplate("success.tpl", array("titulo"=>"Sugerencia enviada", "mensaje"=>$mensaje));
+		/*}else{
 			$mensaje = "Solo puedes incluir una sugerencia cada vez. Debes esperar a que tu sugerencia sea aprobada o que pasen 15 d&iacute;as para poder incluir otra idea. Mientras tanto, puedes ver la lista de sugerencias disponibles.";
 			$response->setResponseSubject("No puedes incluir otra sugerencia por ahora.");
 			$response->createFromTemplate("noSuccess.tpl", array("titulo"=>"No puedes incluir otra sugerencia por ahora.", "mensaje" => $mensaje, "buttonNew" => false, "buttonList" => true));
-		}
+		}*/
 		return $response;
 	}
 
@@ -156,10 +158,7 @@ class Sugerencias extends Service
 					//aqui inserto el voto, aumento el contador y aprovecho para borrar los tickets fuera de limite
 					$connection->deepQuery("
 					INSERT INTO `feedback_votes` (`user`, `feedback`) VALUES ('{$request->email}', '{$request->query}');
-					UPDATE `feedback_tickets` SET likes_count = likes_count + 1 WHERE id = '{$request->query}';
-					DELETE FROM `feedback_tickets` WHERE limit_date <= '{$fechaNow->format('Y-m-d H:i:s')}' AND likes_count < 100;");
-					//para colocar en estado descartado en vez de borrar:
-					//UPDATE `feedback_tickets` SET status = 'DISCARDED' WHERE limit_date <= '{$fechaNow->format('Y-m-d H:i:s')}' AND likes_count < 100;
+					UPDATE `feedback_tickets` SET likes_count = likes_count + 1 WHERE id = '{$request->query}';");
 
 					$votosDisp = $this->getAvaiableVotes($request->email); //cuantos votos quedan despues de votar
 					if ($votosDisp > 0){
@@ -194,7 +193,7 @@ class Sugerencias extends Service
 	 * verify quantity of avaiable votes
 	 */
 	private function getAvaiableVotes($email){
-		$avaiableVotes = 2;
+		$avaiableVotes = 5;
 		$connection = new Connection();
 		$result = $connection->deepQuery("SELECT user FROM feedback_votes WHERE user = '{$email}';");
 		foreach ($result as $value) {
@@ -228,6 +227,44 @@ class Sugerencias extends Service
 			$uniqueFeedback = true;
 		}
 		return $uniqueFeedback;
+	}
+
+	/**
+	 * verify for feedbacks approved and set credits
+	 */
+	private function checkApprovedFedbacks(){
+		$connection = new Connection();
+		$result = $connection->deepQuery("SELECT id, user 
+			FROM feedback_tickets 
+			WHERE likes_count >= limit_votes AND status != 'APPROVED' AND payment_date IS NULL;
+		");
+
+		foreach ($result as $feedback) {
+			// add credit to the user account
+			$connection->deepQuery("UPDATE person SET credit=credit+{$this->CREDITS_X_APPROVED} WHERE email='{$feedback->user}'");
+			$connection->deepQuery("UPDATE feedback_tickets SET status = 'APPROVED', payment_date = NOW(), 	payment_amount = {$this->CREDITS_X_APPROVED} WHERE user = '{$feedback->user}' AND id = {$feedback->id};");
+
+			//ahora a los usuarios que votaron por ese feedback
+			$result2 = $connection->deepQuery("SELECT * FROM feedback_votes WHERE feedback = $feedback->id;");
+			foreach ($result2 as $voto) {
+				$connection->deepQuery("UPDATE person SET credit=credit+{$this->CREDITS_X_VOTE} WHERE email='{$voto->user}';");
+			}
+		}
+
+		return 1;
+	}
+
+	/**
+	 * get limit votes
+	 */
+	private function getLimitVotes(){
+		$limit_votes = 0.0;
+		$connection = new Connection();
+		$result = $connection->deepQuery("SELECT COUNT(email) AS total FROM person WHERE active = 1;");
+		$numberUsersActive = $result[0]->total;
+		$limit_votes = ($numberUsersActive * 0.01); //1% of users active
+
+		return ceil($limit_votes);
 	}	
 }
 
@@ -243,9 +280,12 @@ CREATE TABLE IF NOT EXISTS `feedback_tickets` (
   `subject` varchar(250) NOT NULL,
   `body` varchar(1024) NOT NULL,
   `likes_count` int(11) NOT NULL DEFAULT 0,
+  `limit_votes` int(11) NOT NULL DEFAULT 0,
   `status` enum('NEW','APPROVED','DISCARDED') NOT NULL DEFAULT 'NEW',
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `limit_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `payment_date` timestamp NULL DEFAULT NULL COMMENT 'Date of credit assignment when approved',
+  `payment_amount` float DEFAULT NULL COMMENT 'Credits assigned when approved',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0 ;
 
