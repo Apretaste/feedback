@@ -16,11 +16,12 @@
 		<td align="left">{noimage width="50" height="50" text="{$person}"}</td>
 		<!--ticket-->
 		<td width="100%">
+			{assign var="votosRestantes" value=($ticket->limit_votes - $ticket->likes_count)}
 			{assign var="aux" value=""}
 			{if $ticket->likes_count != 1}
 				{assign var="aux" value="s"}
 			{/if}
-			<small><font color="gray">{$ticket->likes_count} voto{$aux}, Expira el {$ticket->limit_date|date_format:"%d/%m/%Y %I:%M %p"}</font></small><br/>
+			<small><font color="gray">Faltan {$votosRestantes} voto{$aux} para aceptar esta idea, Expira el {$ticket->limit_date|date_format:"%d/%m/%Y %I:%M %p"}</font></small><br/>
 			{$ticket->body|truncate:100:"... "}
 		</td>
 		<!--buttons-->
