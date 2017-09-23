@@ -4,6 +4,7 @@ class Sugerencias extends Service{
 	private $CREDITS_X_APPROVED = 5;
 	private $CREDITS_X_VOTE = 0.5;
 	private $MAX_VOTES_X_USER = 5;
+
 	/**
 	 * Function executed when the service is called
 	 *
@@ -260,6 +261,7 @@ class Sugerencias extends Service{
 	private function getLimitVotes(){
 		$limit_votes = 0.0;
 		$connection = new Connection();
+
 		$result = $connection->deepQuery("SELECT COUNT(email) AS total FROM person WHERE active = 1;");
 		$numberUsersActive = $result[0]->total;
 		$limit_votes = ($numberUsersActive * 0.01); //1% of users active
