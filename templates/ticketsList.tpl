@@ -42,7 +42,7 @@
 {if $voteButtonEnabled == false}
 	<p>No puedes votar por ahora porque ya no tienes ning&uacute;n voto disponible. Debes esperar a que sean aprobadas o descartadas las sugerencias por las que votaste para poder votar por alg&uacute;na otra.</p>
 {else}
-	<p>Votos disponibles: {$votosDisp}.</p>
+	<center><p>Votos disponibles: {$votosDisp}.</p></center>
 {/if}
 {space10}
 

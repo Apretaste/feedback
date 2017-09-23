@@ -94,7 +94,7 @@ class Sugerencias extends Service{
 				VALUES ('{$request->email}', 'FeedBack from {$request->email}', '{$request->query}', {$limitVotes},'{$fechaLimite->format('Y-m-d H:i:s')}'); DELETE FROM `feedback_tickets` WHERE limit_date <= '{$fechaNow->format('Y-m-d H:i:s')}' AND likes_count < {$limitVotes};");
 
 			// create response
-			$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya est&aacute; visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario(incluido t&uacute;) podr&aacute; votar por ella s&oacute;lo una vez, y si llega a sumar 100 votos o m&aacute;s en un plazo de 15 d&iacute;as, ser&aacute; aprobada, si no, se descartar&aacute; y t&uacute; podr&aacute;s enviar otra sugerencia.";
+			$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya est&aacute; visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario(incluido t&uacute;) podr&aacute; votar por ella s&oacute;lo una vez, y si llega a sumar {$limitVotes} votos o m&aacute;s en un plazo de 15 d&iacute;as, ser&aacute; aprobada, si no, se descartar&aacute; y t&uacute; podr&aacute;s enviar otra sugerencia.";
 			$response->setResponseSubject("Sugerencia enviada");
 			$response->createFromTemplate("success.tpl", array("titulo"=>"Sugerencia enviada", "mensaje"=>$mensaje));
 		}else{
