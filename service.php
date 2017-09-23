@@ -4,6 +4,7 @@ class Sugerencias extends Service{
 	private $CREDITS_X_APPROVED = 5;
 	private $CREDITS_X_VOTE = 0.5;
 	private $MAX_VOTES_X_USER = 5;
+	private $MAX_FEEDBACKS_X_USER = 3;
 
 	/**
 	 * Function executed when the service is called
@@ -44,6 +45,7 @@ class Sugerencias extends Service{
 					"userName" => $userName,
 					"userEmail" => $email,
 					"ticketsNum" => count($tickets),
+					"votosDisp" => $votosDisp,
 					"voteButtonEnabled" => $voteButtonEnabled
 				);
 
@@ -78,10 +80,10 @@ class Sugerencias extends Service{
 	private function createFeedback(Request $request){
 		// insert ticket and delete tickets out of limit
 		$connection = new Connection();
-		//$uniqueFeedback = $this->uniqueFeedback($request->email);
+		$avaiableFeedbacks = $this->getAvaiableFeedbacks($request->email);
 		$response = new Response();
 
-		//if($uniqueFeedback){	
+		if($avaiableFeedbacks != 0){	
 			$fecha = new DateTime();
 			$fechaNow = new DateTime();
 			$fechaLimite = $fecha->modify('+15 days');
@@ -95,11 +97,11 @@ class Sugerencias extends Service{
 			$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya est&aacute; visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario(incluido t&uacute;) podr&aacute; votar por ella s&oacute;lo una vez, y si llega a sumar 100 votos o m&aacute;s en un plazo de 15 d&iacute;as, ser&aacute; aprobada, si no, se descartar&aacute; y t&uacute; podr&aacute;s enviar otra sugerencia.";
 			$response->setResponseSubject("Sugerencia enviada");
 			$response->createFromTemplate("success.tpl", array("titulo"=>"Sugerencia enviada", "mensaje"=>$mensaje));
-		/*}else{
-			$mensaje = "Solo puedes incluir una sugerencia cada vez. Debes esperar a que tu sugerencia sea aprobada o que pasen 15 d&iacute;as para poder incluir otra idea. Mientras tanto, puedes ver la lista de sugerencias disponibles.";
+		}else{
+			$mensaje = "Solo puedes incluir {$this->$this->MAX_FEEDBACKS_X_USER} sugerencias cada vez. Debes esperar a que tus sugerencias sean aprobadas o que pasen 15 d&iacute;as para poder incluir otra idea. Mientras tanto, puedes ver la lista de sugerencias disponibles.";
 			$response->setResponseSubject("No puedes incluir otra sugerencia por ahora.");
 			$response->createFromTemplate("noSuccess.tpl", array("titulo"=>"No puedes incluir otra sugerencia por ahora.", "mensaje" => $mensaje, "buttonNew" => false, "buttonList" => true));
-		}*/
+		}
 		return $response;
 	}
 
@@ -194,7 +196,7 @@ class Sugerencias extends Service{
 	 * verify quantity of avaiable votes
 	 */
 	private function getAvaiableVotes($email){
-		$avaiableVotes = 5;
+		$avaiableVotes = $this->MAX_VOTES_X_USER;
 		$connection = new Connection();
 		$result = $connection->deepQuery("SELECT user FROM feedback_votes WHERE user = '{$email}';");
 		foreach ($result as $value) {
@@ -218,16 +220,17 @@ class Sugerencias extends Service{
 	}
 
 	/**
-	 * verify only one feedback per user
+	 * verify avaiable feedbacks per user
 	 */
-	private function uniqueFeedback($email){
-		$uniqueFeedback = false;
+	private function getAvaiableFeedbacks($email){
+		$avaiableFeedbacks = $this->MAX_FEEDBACKS_X_USER;
 		$connection = new Connection();
-		$result = $connection->deepQuery("SELECT user FROM feedback_tickets WHERE user = '{$email}';");
-		if (!$result){
-			$uniqueFeedback = true;
+		$result = $connection->deepQuery("SELECT user FROM feedback_tickets WHERE user = '{$email}' AND status = 'NEW';");
+		foreach ($result as $value) {
+			$avaiableFeedbacks = $avaiableFeedbacks - 1;
+			if ($avaiableFeedbacks == 0) break;
 		}
-		return $uniqueFeedback;
+		return $avaiableFeedbacks;
 	}
 
 	/**
