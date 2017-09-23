@@ -213,7 +213,7 @@ class Sugerencias extends Service{
 	private function getAvaiableVotes($email){
 		$avaiableVotes = $this->MAX_VOTES_X_USER;
 		$connection = new Connection();
-		$result = $connection->deepQuery("SELECT user FROM feedback_votes WHERE user = '{$email}';");
+		$result = $connection->deepQuery("SELECT ticket.user FROM feedback_votes vote, feedback_tickets ticket WHERE ticket.id = vote.feedback AND ticket.status = 'NEW' AND vote.user = '{$email}';");
 		foreach ($result as $value) {
 			$avaiableVotes = $avaiableVotes - 1;
 			if ($avaiableVotes == 0) break;
