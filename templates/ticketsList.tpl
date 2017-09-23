@@ -1,5 +1,5 @@
 <h1>Sugerencias abiertas</h1>
-<p>Escriba una sugerencia para nuestra app o vote por alguna sugerencia abierta. Si su sugerencia es aprobada, ganar&aacute; cr&eacute;ditos. Lease las reglas para aprender m&aacute;s.</p>
+<p>Escriba una sugerencia para nuestra app o vote por alguna sugerencia abierta. Si su sugerencia es aprobada, ganar&aacute; cr&eacute;ditos. Lease las {link href="SUGERENCIAS REGLAS" caption="reglas"} para aprender m&aacute;s.</p>
 {space5}
 
 <table width="100%" cellspacing="0" cellpadding="10" border="0">

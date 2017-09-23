@@ -192,6 +192,21 @@ class Sugerencias extends Service{
 		return $response;
 	}
 
+/**
+	 * Sub-service reglas, Display the rules of the service
+	 * @param Request
+	 * @return Response
+	 */
+	public function _reglas(Request $request){
+		$responseContent = array();
+
+		$response = new Response();
+		//$response->setCache(180);
+		$response->setResponseSubject("Reglas del servicio Sugerencias.");
+		$response->createFromTemplate("rules.tpl", $responseContent);
+		return $response;
+	}
+
 	/**
 	 * verify quantity of avaiable votes
 	 */
