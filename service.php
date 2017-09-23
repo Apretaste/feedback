@@ -204,6 +204,7 @@ class Sugerencias extends Service
 	public function _reglas(Request $request)
 	{
 		$response = new Response();
+		$response->setCache();
 		$response->setResponseSubject("Como agregar sugerencias y votar");
 		$response->createFromTemplate("rules.tpl", array());
 		return $response;
