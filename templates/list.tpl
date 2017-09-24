@@ -16,7 +16,7 @@
 		<tr bgcolor="{$bgcolor}">
 			<td>
 				<!--details-->
-				<small><font color="gray">Creda por {link href="PERFIL @{$ticket->username}" caption="@{$ticket->username}"}. Expira el {$ticket->limit_date|date_format:"%d/%m"}. Faltan {$ticket->limit_votes - $ticket->votes_count} votos</font></small>
+				<small><font color="gray">Creada por {link href="PERFIL @{$ticket->username}" caption="@{$ticket->username}"}. Expira el {$ticket->limit_date|date_format:"%d/%m"}. Faltan {$ticket->limit_votes - $ticket->votes_count} votos</font></small>
 				<br/>
 
 				<!--content-->
