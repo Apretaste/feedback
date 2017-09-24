@@ -35,12 +35,14 @@ class Sugerencias extends Service
 		$votosDisp = $this->getAvailableVotes($request->email);
 		$voteButtonEnabled = $votosDisp > 0;
 
+		// get all the usernames
+		foreach ($tickets as $ticket) {
+			$ticket->username = $this->utils->getUsernameFromEmail($ticket->user);
+		}
+
 		// create response array
 		$responseContent = array(
 			"tickets" => $tickets,
-			"userName" => $request->username,
-			"userEmail" => $request->email,
-			"ticketsNum" => count($tickets),
 			"votosDisp" => $votosDisp,
 			"voteButtonEnabled" => $voteButtonEnabled
 		);

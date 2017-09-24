@@ -11,18 +11,12 @@
 
 <table width="100%" cellspacing="0" cellpadding="5" border="0">
 	{foreach from=$tickets item=ticket}
-		{assign var="posArroba" value=$ticket->user|strpos:"@"}
 		{assign var="bgcolor" value="{cycle values="#f2f2f2,white"}"}
-		{assign var="person" value="<small>{$ticket->user|substr:0:$posArroba}</small>"}
-		{if $ticket->user == $userEmail}{assign var="person" value="YO"}{/if}
 
 		<tr bgcolor="{$bgcolor}">
-			<!--image-->
-			<td align="center" valign="middle">{noimage width="50" height="50" text="{$person}"}</td>
-
-			<td width="100%">
+			<td>
 				<!--details-->
-				<small><font color="gray">Expira el {$ticket->limit_date|date_format:"%d/%m/%Y"} y faltan {$ticket->limit_votes - $ticket->votes_count} votos</font></small>
+				<small><font color="gray">Creda por {link href="PERFIL @{$ticket->username}" caption="@{$ticket->username}"}. Expira el {$ticket->limit_date|date_format:"%d/%m"}. Faltan {$ticket->limit_votes - $ticket->votes_count} votos</font></small>
 				<br/>
 
 				<!--content-->
