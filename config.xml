@@ -1,5 +1,8 @@
 <service>
 	<serviceName>sugerencias</serviceName>
+	<serviceAliases>
+		<alias>sugerencia</alias>
+	</serviceAliases>
 	<serviceDescription>Envia ideas para mejorar Apretaste, y recibe votos de otros usuarios y gana creditos cuando tus ideas sean aprobadas.</serviceDescription>
 	<creatorEmail>jaikerkings@yahoo.es</creatorEmail>
 	<serviceCategory>comunicaciones</serviceCategory>
