@@ -2,8 +2,8 @@
 -- Table structure for table `sugerencias_list`
 --
 
-DROP TABLE IF EXISTS `sugerencias_list`;
-CREATE TABLE IF NOT EXISTS `sugerencias_list` (
+DROP TABLE IF EXISTS `_sugerencias_list`;
+CREATE TABLE IF NOT EXISTS `_sugerencias_list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` char(100) NOT NULL,
   `text` varchar(1024) NOT NULL,
@@ -19,11 +19,11 @@ CREATE TABLE IF NOT EXISTS `sugerencias_list` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `sugerencias_votes`
+-- Table structure for table `_sugerencias_votes`
 --
 
-DROP TABLE IF EXISTS `sugerencias_votes`;
-CREATE TABLE IF NOT EXISTS `sugerencias_votes` (
+DROP TABLE IF EXISTS `_sugerencias_votes`;
+CREATE TABLE IF NOT EXISTS `_sugerencias_votes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` char(100) NOT NULL,
   `feedback` int(11) NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `sugerencias_votes` (
 --
 
 --
--- Constraints for table `sugerencias_votes`
+-- Constraints for table `_sugerencias_votes`
 --
-ALTER TABLE `sugerencias_votes`
-  ADD CONSTRAINT `sugerencias_votes_ibfk_1` FOREIGN KEY (`feedback`) REFERENCES `sugerencias_list` (`id`) ON DELETE CASCADE;
+ALTER TABLE `_sugerencias_votes`
+  ADD CONSTRAINT `sugerencias_votes_ibfk_1` FOREIGN KEY (`feedback`) REFERENCES `_sugerencias_list` (`id`) ON DELETE CASCADE;

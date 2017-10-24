@@ -16,14 +16,13 @@ class Sugerencias extends Service
 	{
 		// discard suggestions that run out of time
 		$connection = new Connection();
-		$connection->query("UPDATE sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date<=CURRENT_TIMESTAMP AND status='NEW'");
+		$connection->query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date<=CURRENT_TIMESTAMP AND status='NEW'");
 
 		// get list of tickets
-		$tickets = $connection->query("SELECT * FROM sugerencias_list WHERE status='NEW' ORDER BY votes_count DESC");
+		$tickets = $connection->query("SELECT * FROM _sugerencias_list WHERE status='NEW' ORDER BY votes_count DESC");
 
 		// if not sugestion is registered
-		if(empty($tickets))
-		{
+		if(empty($tickets)) {
 			$response = new Response();
 			$mensaje = "Actualmente no hay registrada ninguna sugerencia. A&ntilde;ada la primera sugerencia usando el bot&oacute;n de abajo.";
 			$response->setResponseSubject("No hay ninguna sugerencia abierta todavia.");
@@ -81,7 +80,7 @@ class Sugerencias extends Service
 
 		// insert a new suggestion
 		$id = $connection->query("
-			INSERT INTO sugerencias_list (`user`, `text`, `limit_votes`, `limit_date`)
+			INSERT INTO _sugerencias_list (`user`, `text`, `limit_votes`, `limit_date`)
 			VALUES ('{$request->email}', '{$request->query}', '$limitVotes', '$deadline')");
 
 		// create response
@@ -101,7 +100,7 @@ class Sugerencias extends Service
 	{
 		// get the suggestion
 		$connection = new Connection();
-		$suggestion = $connection->query("SELECT * FROM sugerencias_list WHERE id='{$request->query}'");
+		$suggestion = $connection->query("SELECT * FROM _sugerencias_list WHERE id='{$request->query}'");
 		if(empty($suggestion)) return new Response();
 		else $suggestion = $suggestion[0];
 
@@ -135,7 +134,7 @@ class Sugerencias extends Service
 
 		// do not let pass without ID, and get the suggestion for later
 		$connection = new Connection();
-		$suggestion = $connection->query("SELECT `user`, votes_count, limit_votes FROM sugerencias_list WHERE id={$request->query}");
+		$suggestion = $connection->query("SELECT `user`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->query}");
 		if(empty($suggestion)) return $response; else $suggestion = $suggestion[0];
 
 		// check you have enough available votes
@@ -148,7 +147,7 @@ class Sugerencias extends Service
 		}
 
 		// check if the user already voted for that idea
-		$res = $connection->query("SELECT COUNT(id) as nbr FROM sugerencias_votes WHERE user='{$request->email}' AND feedback='{$request->query}'");
+		$res = $connection->query("SELECT COUNT(id) as nbr FROM _sugerencias_votes WHERE user='{$request->email}' AND feedback='{$request->query}'");
 		if($res[0]->nbr > 0){
 			$mensaje = "No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.";
 			$response->setResponseSubject("No puedes repetir votos.");
@@ -158,8 +157,8 @@ class Sugerencias extends Service
 
 		// aqui inserto el voto y aumento el contador
 		$connection->query("
-			INSERT INTO sugerencias_votes (`user`, feedback) VALUES ('{$request->email}', '{$request->query}');
-			UPDATE sugerencias_list SET votes_count=votes_count+1 WHERE id={$request->query};");
+			INSERT INTO _sugerencias_votes (`user`, feedback) VALUES ('{$request->email}', '{$request->query}');
+			UPDATE _sugerencias_list SET votes_count=votes_count+1 WHERE id={$request->query};");
 
 		// check if the idea reached the number of votes to be approved
 		if($suggestion->votes_count + 1 >= $suggestion->limit_votes)
@@ -170,7 +169,7 @@ class Sugerencias extends Service
 			$this->utils->addNotification($suggestion->user, "Sugerencias", $msg, "SUGERENCIAS VER {$request->query}");
 
 			// get all the people who voted for the suggestion
-			$voters = $connection->query("SELECT `user`, feedback FROM `sugerencias_votes` WHERE `feedback` = {$request->query}");
+			$voters = $connection->query("SELECT `user`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->query}");
 
 			// asign credits to the voters and send a notification
 			$longQuery = '';
@@ -181,7 +180,7 @@ class Sugerencias extends Service
 			} $connection->query($longQuery);
 
 			// mark suggestion as approved
-			$connection->query("UPDATE sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->query}");
+			$connection->query("UPDATE _sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->query}");
 		}
 
 		// create message to send to the user
@@ -218,7 +217,7 @@ class Sugerencias extends Service
 	private function getAvailableVotes($email)
 	{
 		$connection = new Connection();
-		$res = $connection->query("SELECT COUNT(user) as nbr FROM sugerencias_votes WHERE user = '$email'");
+		$res = $connection->query("SELECT COUNT(user) as nbr FROM _sugerencias_votes WHERE user = '$email'");
 		return $this->MAX_VOTES_X_USER - $res[0]->nbr;
 	}
 }
