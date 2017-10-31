@@ -1,4 +1,4 @@
-<h1>Sugerencias abiertas</h1>
+<h1>{$subject}</h1>
 <p>Escriba una sugerencia para nuestra app o vote por alguna sugerencia abierta. Si su sugerencia es aprobada, ganar&aacute; cr&eacute;ditos.</p>
 
 <center>

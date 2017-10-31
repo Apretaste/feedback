@@ -10,25 +10,43 @@ class Sugerencias extends Service
 	 * Function executed when the service is called
 	 *
 	 * @param Request $request
-	 * @param int $limit
+	 * @param int     $limit
+	 *
 	 * @return Response
 	 */
 	public function _main(Request $request, $limit = 20)
 	{
+		return $this->getMainResponse("Sugerencias abiertas", "No hay sugerencias registradas", $request, 20, 'NEW');
+	}
+
+	/**
+	 * Common response for some requests
+	 *
+	 * @param string   $subject
+	 * @param string   $no_subject
+	 * @param \Request $request
+	 * @param int      $limit
+	 * @param string   $status
+	 * @param string   $order
+	 *
+	 * @return \Response
+	 */
+	private function getMainResponse($subject, $no_subject, Request $request, $limit = 20, $status = 'NEW', $order = 'votes_count DESC')
+	{
 		// discard suggestions that run out of time
-		$connection = new Connection();
-		$connection->query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date<=CURRENT_TIMESTAMP AND status='NEW'");
+		Connection::query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date<=CURRENT_TIMESTAMP AND status='NEW'");
 
 		// get list of tickets
-		$tickets = $connection->query("SELECT * FROM _sugerencias_list WHERE status='NEW' ORDER BY votes_count DESC" . ($limit > - 1 ? " LIMIT 0, 20" : ""));
+		$tickets = Connection::query("SELECT * FROM _sugerencias_list WHERE status='$status' ORDER BY $order " . ($limit > - 1 ? " LIMIT 0, 20" : ""));
 
 		// if not suggestion is registered
-		if(empty($tickets)) {
+		if(empty($tickets))
+		{
 			$response = new Response();
 			$message  = "Actualmente no hay registrada ninguna sugerencia. A&ntilde;ada la primera sugerencia usando el bot&oacute;n de abajo.";
 			$response->setResponseSubject("No hay ninguna sugerencia abierta todavia.");
 			$response->createFromTemplate("fail.tpl", [
-				"titulo" => "No hay sugerencias registradas",
+				"titulo" => $no_subject,
 				"mensaje" => $message,
 				"buttonNew" => true,
 				"buttonList" => false
@@ -49,6 +67,7 @@ class Sugerencias extends Service
 
 		// create response array
 		$responseContent = [
+			"subject" => $subject,
 			"tickets" => $tickets,
 			"votosDisp" => $availableVotes,
 			"voteButtonEnabled" => $voteButtonEnabled
@@ -58,10 +77,11 @@ class Sugerencias extends Service
 
 		// return response object
 		$response = new Response();
-		$response->setResponseSubject("Lista de sugerencias recibidas");
+		$response->setResponseSubject($subject);
 		$response->createFromTemplate("list.tpl", $responseContent);
 
 		return $response;
+
 	}
 
 	/**
@@ -94,12 +114,11 @@ class Sugerencias extends Service
 		$deadline = $fecha->modify('+15 days')->format('Y-m-d H:i:s');
 
 		// get the number of votes to approved the suggestion
-		$connection = new Connection();
-		$result     = $connection->query("SELECT COUNT(email) AS nbr FROM person WHERE active=1");
+		$result     = Connection::query("SELECT COUNT(email) AS nbr FROM person WHERE active=1");
 		$limitVotes = ceil($result[0]->nbr * 0.01);
 
 		// insert a new suggestion
-		$id = $connection->query("
+		$id = Connection::query("
 			INSERT INTO _sugerencias_list (`user`, `text`, `limit_votes`, `limit_date`)
 			VALUES ('{$request->email}', '{$request->query}', '$limitVotes', '$deadline')");
 
@@ -122,8 +141,7 @@ class Sugerencias extends Service
 	public function _ver(Request $request)
 	{
 		// get the suggestion
-		$connection = new Connection();
-		$suggestion = $connection->query("SELECT * FROM _sugerencias_list WHERE id='{$request->query}'");
+		$suggestion = Connection::query("SELECT * FROM _sugerencias_list WHERE id='{$request->query}'");
 		if(empty($suggestion)) return new Response();
 		else $suggestion = $suggestion[0];
 
@@ -162,8 +180,7 @@ class Sugerencias extends Service
 		$response = new Response();
 
 		// do not let pass without ID, and get the suggestion for later
-		$connection = new Connection();
-		$suggestion = $connection->query("SELECT `user`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->query}");
+		$suggestion = Connection::query("SELECT `user`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->query}");
 		if(empty($suggestion)) return $response;
 		else $suggestion = $suggestion[0];
 
@@ -184,7 +201,7 @@ class Sugerencias extends Service
 		}
 
 		// check if the user already voted for that idea
-		$res = $connection->query("SELECT COUNT(id) as nbr FROM _sugerencias_votes WHERE user='{$request->email}' AND feedback='{$request->query}'");
+		$res = Connection::query("SELECT COUNT(id) as nbr FROM _sugerencias_votes WHERE user='{$request->email}' AND feedback='{$request->query}'");
 		if($res[0]->nbr > 0)
 		{
 			$mensaje = "No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.";
@@ -200,7 +217,7 @@ class Sugerencias extends Service
 		}
 
 		// aqui inserto el voto y aumento el contador
-		$connection->query("
+		Connection::query("
 			INSERT INTO _sugerencias_votes (`user`, feedback) VALUES ('{$request->email}', '{$request->query}');
 			UPDATE _sugerencias_list SET votes_count=votes_count+1 WHERE id={$request->query};");
 
@@ -208,12 +225,12 @@ class Sugerencias extends Service
 		if($suggestion->votes_count + 1 >= $suggestion->limit_votes)
 		{
 			// asign credits to the creator and send a notification
-			$connection->query("UPDATE person SET credit=credit+{$this->CREDITS_X_APPROVED} WHERE email='{$suggestion->user}'");
+			Connection::query("UPDATE person SET credit=credit+{$this->CREDITS_X_APPROVED} WHERE email='{$suggestion->user}'");
 			$msg = "Una sugerencia suya ha sido aprobada y usted gano §{$this->CREDITS_X_APPROVED}. Gracias!";
 			$this->utils->addNotification($suggestion->user, "Sugerencias", $msg, "SUGERENCIAS VER {$request->query}");
 
 			// get all the people who voted for the suggestion
-			$voters = $connection->query("SELECT `user`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->query}");
+			$voters = Connection::query("SELECT `user`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->query}");
 
 			// asign credits to the voters and send a notification
 			$longQuery = '';
@@ -223,10 +240,10 @@ class Sugerencias extends Service
 				$msg       = "Usted voto por una sugerencia que ha sido aprobada y por lo tanto gano §{$this->CREDITS_X_VOTE}";
 				$this->utils->addNotification($voter->user, "Sugerencias", $msg, "SUGERENCIAS VER {$voter->feedback}");
 			}
-			$connection->query($longQuery);
+			Connection::query($longQuery);
 
 			// mark suggestion as approved
-			$connection->query("UPDATE _sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->query}");
+			Connection::query("UPDATE _sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->query}");
 		}
 
 		// create message to send to the user
@@ -269,12 +286,19 @@ class Sugerencias extends Service
 	 */
 	public function _todas(Request $request)
 	{
-		return $this->_main($request, -1);
+		return $this->getMainResponse("Todas las sugerencias recibidas", "No hay sugerencias registradas", $request, - 1);
 	}
 
+	/**
+	 * Subservice aprobadas
+	 *
+	 * @param \Request $request
+	 *
+	 * @return \Response
+	 */
 	public function _aprobadas(Request $request)
 	{
-
+		return $this->getMainResponse("Lista de sugerencias aprobadas", "No hay sugerencias aprobadas", $request, - 1, 'APPROVED', 'updated DESC');
 	}
 
 	/**
@@ -282,8 +306,8 @@ class Sugerencias extends Service
 	 */
 	private function getAvailableVotes($email)
 	{
-		$connection = new Connection();
-		$res        = $connection->query("SELECT COUNT(user) as nbr FROM _sugerencias_votes WHERE user = '$email'");
+		$res = Connection::query("SELECT COUNT(user) as nbr FROM _sugerencias_votes WHERE user = '$email'");
+
 		return $this->MAX_VOTES_X_USER - $res[0]->nbr;
 	}
 }
