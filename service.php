@@ -36,6 +36,8 @@ class Sugerencias extends Service
 		// discard suggestions that run out of time
 		Connection::query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date<=CURRENT_TIMESTAMP AND status='NEW'");
 
+		//TODO: send notification here 
+
 		// get list of tickets
 		$tickets = Connection::query("SELECT * FROM _sugerencias_list WHERE status='$status' ORDER BY $order " . ($limit > - 1 ? " LIMIT 0, 20" : ""));
 
