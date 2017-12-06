@@ -31,7 +31,7 @@ class Sugerencias extends Service
 	 *
 	 * @return \Response
 	 */
-	private function getMainResponse($subject, $no_subject, Request $request, $limit = 20, $status = 'NEW', $order = 'votes_count DESC')
+	private function getMainResponse($subject, $no_subject, Request $request, $limit = 20, $status = 'NEW', $order = 'votes_count DESC', $tpl = 'list.tpl')
 	{
 		// discard suggestions that run out of time
 		Connection::query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date<=CURRENT_TIMESTAMP AND status='NEW'");
@@ -80,7 +80,7 @@ class Sugerencias extends Service
 		// return response object
 		$response = new Response();
 		$response->setResponseSubject($subject);
-		$response->createFromTemplate("list.tpl", $responseContent);
+		$response->createFromTemplate($tpl, $responseContent);
 
 		return $response;
 
@@ -300,7 +300,7 @@ class Sugerencias extends Service
 	 */
 	public function _aprobadas(Request $request)
 	{
-		return $this->getMainResponse("Lista de sugerencias aprobadas", "No hay sugerencias aprobadas", $request, - 1, 'APPROVED', 'updated DESC');
+		return $this->getMainResponse("Lista de sugerencias aprobadas", "No hay sugerencias aprobadas", $request, - 1, 'APPROVED', 'updated DESC', 'approved.tpl');
 	}
 
 	/**
