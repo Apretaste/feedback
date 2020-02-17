@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `_sugerencias_votes` (
   `feedback` int(11) NOT NULL,
   `vote_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `feedback` (`feedback`)
+  UNIQUE (person_id, feedback)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
 
 --
@@ -42,3 +42,5 @@ CREATE TABLE IF NOT EXISTS `_sugerencias_votes` (
 --
 ALTER TABLE `_sugerencias_votes`
   ADD CONSTRAINT `sugerencias_votes_ibfk_1` FOREIGN KEY (`feedback`) REFERENCES `_sugerencias_list` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `_sugerencias_list` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_swedish_ci;

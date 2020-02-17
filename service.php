@@ -123,8 +123,8 @@ class Service {
 
 		// insert a new suggestion
 		$id = Database::query("
-			INSERT INTO _sugerencias_list (`user`, `text`, `limit_votes`, `limit_date`)
-			VALUES ('{$request->email}', '{$request->query}', '$limitVotes', '$deadline')");
+			INSERT INTO _sugerencias_list (`person_id`, `text`, `limit_votes`, `limit_date`)
+			VALUES ('{$request->person->id}', '{$request->input->data->query}', '$limitVotes', '$deadline')");
 
 		// create response
 		$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya est&aacute; visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario (incluido usted) podr&aacute; votar, y si llega a sumar {$limitVotes} votos o m&aacute;s en un plazo de 15 d&iacute;as, ser&aacute; aprobada y todos ganar&aacute;n cr&eacute;ditos.";
@@ -145,7 +145,7 @@ class Service {
 	 */
 	public function _ver(Request $request, Response $response) {
 		// get the suggestion
-		$suggestion = Database::query("SELECT *, (SELECT username FROM person where person.id = suggestion.person_id) FROM _sugerencias_list WHERE id='{$request->input->data->id}'");
+		$suggestion = Database::query("SELECT *, (SELECT username FROM person where person.id = suggestion.person_id) as username FROM _sugerencias_list WHERE id='{$request->input->data->id}'");
 
 		if (empty($suggestion)) {
 			return;
@@ -155,7 +155,6 @@ class Service {
 
 		// get the username who created the suggestion
 		$user = Person::find($suggestion->user);
-		$suggestion->username = $this->utils->getUsernameFromEmail($suggestion->user);
 
 		// check if vote button should be enabled
 		$votosDisp = $this->getAvailableVotes($request->email);
@@ -183,7 +182,7 @@ class Service {
 	public function _votar(Request $request, Response $response) {
 
 		// do not let pass without ID, and get the suggestion for later
-		$suggestion = Database::query("SELECT `user`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->query}");
+		$suggestion = Database::query("SELECT `user`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->input->data->id}");
 		if (empty($suggestion)) {
 			return;
 		}
@@ -205,7 +204,7 @@ class Service {
 		}
 
 		// check if the user already voted for that idea
-		$res = Database::query("SELECT COUNT(id) as nbr FROM _sugerencias_votes WHERE user='{$request->email}' AND feedback='{$request->query}'");
+		$res = Database::query("SELECT COUNT(id) as nbr FROM _sugerencias_votes WHERE person_id='{$request->person->id}' AND feedback='{$request->input->data->id}'");
 		if ($res[0]->nbr > 0) {
 			$mensaje = 'No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.';
 			$response->setTemplate('fail.ejs', [
@@ -220,8 +219,8 @@ class Service {
 
 		// aqui inserto el voto y aumento el contador
 		Database::query("
-			INSERT INTO _sugerencias_votes (`user`, feedback) VALUES ('{$request->email}', '{$request->query}');
-			UPDATE _sugerencias_list SET votes_count=votes_count+1 WHERE id={$request->query};");
+			INSERT INTO _sugerencias_votes (`person_id`, feedback) VALUES ('{$request->person->id}', '{$request->input->data->id}');
+			UPDATE _sugerencias_list SET votes_count=votes_count+1 WHERE id={$request->input->data->id};");
 
 		// check if the idea reached the number of votes to be approved
 		if ($suggestion->votes_count + 1 >= $suggestion->limit_votes) {
@@ -234,7 +233,7 @@ class Service {
 			//$this->utils->addNotification($suggestion->user, 'Sugerencias', $msg, );
 
 			// get all the people who voted for the suggestion
-			$voters = Database::query("SELECT `user`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->query}");
+			$voters = Database::query("SELECT `user`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->input->data->id}");
 
 			// asign credits to the voters and send a notification
 			$longQuery = '';
@@ -248,7 +247,7 @@ class Service {
 			Database::query($longQuery);
 
 			// mark suggestion as approved
-			Database::query("UPDATE _sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->query}");
+			Database::query("UPDATE _sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->input->data->id}");
 		}
 
 		// create message to send to the user
