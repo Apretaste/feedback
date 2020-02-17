@@ -35,7 +35,7 @@ function formatDateTime(dateStr) {
 }
 
 function post(){
-  var text = $('#text').value();
+  var text = $('#text').val();
 
   if (text.length < 10) {
     showToast("Escriba un poco mas");
