@@ -92,7 +92,10 @@ class Service {
 	 */
 	public function _crear(Request $request, Response $response) {
 
-		if (strlen($request->input->data->query) == 0) {
+		if (!isset($request->input->data->query))
+			$request->input->data->query = '';
+
+		if ($request->input->data->query === '') {
 			$response->setTemplate('create.ejs');
 			return;
 		}
