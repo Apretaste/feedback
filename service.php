@@ -140,7 +140,7 @@ class Service {
 	 */
 	public function _ver(Request $request, Response $response) {
 		// get the suggestion
-		$suggestion = Database::query("SELECT *, (SELECT username FROM person where person.id = suggestion.person_id) as username FROM _sugerencias_list WHERE id='{$request->input->data->id}'");
+		$suggestion = Database::query("SELECT *, (SELECT username FROM person where person.id = _sugerencias_list.person_id) as username FROM _sugerencias_list WHERE id='{$request->input->data->id}'");
 
 		if (empty($suggestion)) {
 			return;
