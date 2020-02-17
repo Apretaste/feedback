@@ -3,7 +3,7 @@
 	Sugerida por @<%= suggestion.username %><br/>
 	<% if (suggestion.status == "NEW") { %>
 		<p>Expira el <%= formatDateTime(suggestion.limit_date) %></p>
-		<p>Faltan <%= suggestion.limit_votes - $suggestion.votes_count %> votos para aprobarla</p>
+		<p>Faltan <%= suggestion.limit_votes - suggestion.votes_count %> votos para aprobarla</p>
 	<% } %>
 	<p>Estado: <%= suggestion.estado %></p>
 	<p style="background-color:#F2F2F2; padding:10px;"><big><%= suggestion.text %></big></p>
