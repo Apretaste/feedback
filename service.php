@@ -91,6 +91,12 @@ class Service {
 	 * @throws \Framework\Alert
 	 */
 	public function _crear(Request $request, Response $response) {
+
+		if (strlen($request->input->data->query) == 0) {
+			$response->setTemplate('create.ejs');
+			return;
+		}
+
 		// do not post short suggestions
 		if (strlen($request->input->data->query) <= 10) {
 			$mensaje = 'Esta sugerencia no se entiende. Por favor escribe una idea v&aacute;lida, puedes a&ntilde;adir una usando el boton de abajo.';

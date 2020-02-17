@@ -1,3 +1,8 @@
+function showToast(text) {
+  M.toast({
+    html: text
+  });
+}
 $(function(){
 
   $('.fixed-action-btn').floatingActionButton({
@@ -27,4 +32,17 @@ function formatDateTime(dateStr) {
   }
   var amOrPm = (date.getHours() < 12) ? "am" : "pm";
   return day + ' de ' + months[month] + ' a las ' + hour + ':' + minutes + amOrPm;
+}
+
+function post(){
+  var text = $('#text').value();
+
+  if (text.length < 10) {
+    showToast("Escriba un poco mas");
+    return;
+  }
+  apretaste.send({
+    command: 'SUGERENCIAS CREAR',
+    query: text
+  });
 }
