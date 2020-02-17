@@ -61,7 +61,7 @@ class Service {
 		}
 
 		// check if vote button should be enabled
-		$availableVotes = $this->getAvailableVotes($request->email);
+		$availableVotes = $this->getAvailableVotes($request->person->id);
 		$voteButtonEnabled = $availableVotes > 0;
 
 		// get all the user names
@@ -154,10 +154,10 @@ class Service {
 		$suggestion = $suggestion[0];
 
 		// get the username who created the suggestion
-		$user = Person::find($suggestion->user);
+		$user = Person::find($suggestion->person_id);
 
 		// check if vote button should be enabled
-		$votosDisp = $this->getAvailableVotes($request->email);
+		$votosDisp = $this->getAvailableVotes($request->person->id);
 		$voteButtonEnabled = $votosDisp > 0 && $suggestion->status==='NEW';
 
 		// translate the status varible
@@ -182,7 +182,7 @@ class Service {
 	public function _votar(Request $request, Response $response) {
 
 		// do not let pass without ID, and get the suggestion for later
-		$suggestion = Database::query("SELECT `user`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->input->data->id}");
+		$suggestion = Database::query("SELECT `person_id`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->input->data->id}");
 		if (empty($suggestion)) {
 			return;
 		}
@@ -190,7 +190,7 @@ class Service {
 		$suggestion = $suggestion[0];
 
 		// check you have enough available votes
-		$votosDisp = $this->getAvailableVotes($request->email);
+		$votosDisp = $this->getAvailableVotes($request->person->id);
 		if ($votosDisp <= 0) {
 			$mensaje = 'No tienes ning&uacute;n voto disponible. Debes esperar a que sean aprobadas o descartadas las sugerencias por las que votaste para poder votar por alg&uacute;na otra. Mientras tanto, puedes ver la lista de sugerencias disponibles o escribir una nueva sugerencia.';
 			$response->setTemplate('fail.ejs', [
@@ -225,7 +225,7 @@ class Service {
 		// check if the idea reached the number of votes to be approved
 		if ($suggestion->votes_count + 1 >= $suggestion->limit_votes) {
 			// asign credits to the creator and send a notification
-			Database::query("UPDATE person SET credit=credit+{$this->CREDITS_X_APPROVED} WHERE email='{$suggestion->user}'");
+			Database::query("UPDATE person SET credit=credit+{$this->CREDITS_X_APPROVED} WHERE email='{$suggestion->person_id}'");
 
 			$msg = "Una sugerencia suya ha sido aprobada y usted gano §{$this->CREDITS_X_APPROVED}. Gracias!";
 			Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->query.'"}}');
@@ -233,12 +233,12 @@ class Service {
 			//$this->utils->addNotification($suggestion->user, 'Sugerencias', $msg, );
 
 			// get all the people who voted for the suggestion
-			$voters = Database::query("SELECT `user`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->input->data->id}");
+			$voters = Database::query("SELECT `person_id`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->input->data->id}");
 
 			// asign credits to the voters and send a notification
 			$longQuery = '';
 			foreach ($voters as $voter) {
-				$longQuery .= "UPDATE person SET credit=credit+{$this->CREDITS_X_VOTE} WHERE email='{$voter->user}';";
+				$longQuery .= "UPDATE person SET credit=credit+{$this->CREDITS_X_VOTE} WHERE email='{$voter->person_id}';";
 				$msg = "Usted voto por una sugerencia que ha sido aprobada y por lo tanto gano §{$this->CREDITS_X_VOTE}";
 				Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$voter->feedback.'"}}');
 				//$this->utils->addNotification($voter->user, 'Sugerencias', $msg, "SUGERENCIAS VER {$voter->feedback}");
@@ -302,9 +302,14 @@ class Service {
 
 	/**
 	 * verify quantity of avaiable votes
+	 *
+	 * @param $personId
+	 *
+	 * @return int
+	 * @throws \Framework\Alert
 	 */
-	private function getAvailableVotes($email) {
-		$res = Database::query("SELECT COUNT(user) as nbr FROM _sugerencias_votes WHERE user = '$email'");
+	private function getAvailableVotes($personId) {
+		$res = Database::query("SELECT COUNT(*) as nbr FROM _sugerencias_votes WHERE person_id = '$personId'");
 
 		return $this->MAX_VOTES_X_USER - $res[0]->nbr;
 	}
