@@ -66,7 +66,7 @@ class Service {
 
 		// get all the user names
 		foreach ($tickets as $ticket) {
-			$ticket->username = $request->input->person->username;
+			$ticket->username = $request->person->username;
 		}
 
 		// create response array
