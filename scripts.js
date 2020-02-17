@@ -1,3 +1,12 @@
+$(function(){
+
+  $('.fixed-action-btn').floatingActionButton({
+    direction: 'top',
+    hoverEnabled: false
+  });
+
+});
+
 function formatDate(dateStr) {
   var date = new Date(dateStr);
   var year = date.getFullYear();

@@ -2,6 +2,7 @@
 -- Table structure for table `sugerencias_list`
 --
 
+ALTER TABLE `_sugerencias_votes` DROP CONSTRAINT sugerencias_votes_ibfk_1;
 DROP TABLE IF EXISTS `_sugerencias_list`;
 CREATE TABLE IF NOT EXISTS `_sugerencias_list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -10,11 +11,11 @@ CREATE TABLE IF NOT EXISTS `_sugerencias_list` (
   `votes_count` int(6) NOT NULL DEFAULT '0',
   `status` enum('NEW','APPROVED','DISCARDED') NOT NULL DEFAULT 'NEW',
   `limit_votes` int(11) NOT NULL DEFAULT '0',
-  `limit_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `limit_date` timestamp,
   `inserted` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NULL DEFAULT NULL COMMENT 'Date when gets approved or rejected',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -30,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `_sugerencias_votes` (
   `vote_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `feedback` (`feedback`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=19 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
 
 --
 -- Constraints for dumped tables
