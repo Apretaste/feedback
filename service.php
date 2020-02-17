@@ -145,7 +145,7 @@ class Service {
 		$suggestion = $suggestion[0];
 
 		// get the username who created the suggestion
-		$user = Person::find($suggestion->user)
+		$user = Person::find($suggestion->user);
 		$suggestion->username = $this->utils->getUsernameFromEmail($suggestion->user);
 
 		// check if vote button should be enabled
