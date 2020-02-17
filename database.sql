@@ -5,7 +5,7 @@
 DROP TABLE IF EXISTS `_sugerencias_list`;
 CREATE TABLE IF NOT EXISTS `_sugerencias_list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` char(100) NOT NULL,
+  `person_id` bigint(11) NOT NULL,
   `text` varchar(1024) NOT NULL,
   `votes_count` int(6) NOT NULL DEFAULT '0',
   `status` enum('NEW','APPROVED','DISCARDED') NOT NULL DEFAULT 'NEW',
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `_sugerencias_list` (
 DROP TABLE IF EXISTS `_sugerencias_votes`;
 CREATE TABLE IF NOT EXISTS `_sugerencias_votes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` char(100) NOT NULL,
+  `person_id` bigint(11) NOT NULL,
   `feedback` int(11) NOT NULL,
   `vote_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

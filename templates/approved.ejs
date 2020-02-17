@@ -1,0 +1,44 @@
+<div class="row">
+	<div class="col s12 l12 m12 x12">
+		<h1><%= subject %></h1>
+    </div>
+</div>
+<div class="row">
+	<div class="col s12 l12 m12 x12">
+		<table class="table striped">
+            <% for(var i=0; i < tickets.length; i++) { var ticket=tickets[i]; %>
+            <tr>
+                <td>
+                    <!--details-->
+                    <small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a></small>
+                    <br/>
+
+                    <!--content-->
+                    <%= ticket.text.substring(0,100) %>...
+
+                    <!--buttons-->
+                    <a class="btn" href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});" >&#x1f50d; Leer</a>
+                </td>
+            </tr>
+            <% } %>
+        </table>
+    </div>
+</div>
+
+<div class="fixed-action-btn">
+	<a class="btn-floating btn-large green">
+		<i class="large material-icons">more_horiz</i>
+	</a>
+	<ul>
+        <li>
+            <a href="#!" class="btn-floating" onclick="apretaste.send({command: 'SUGERENCIAS CREAR'});"><i class="material-icons left">plus_one</i>Agregar</a>
+        </li>
+        <li>
+            <a href="#!" class="btn-floating" onclick="apretaste.send({command: 'SUGERENCIAS REGLAS'});" ><i class="material-icons left">assignment</i>Reglas</a>
+        </li>
+	</ul>
+</div>
+
+
+
+

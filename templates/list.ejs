@@ -1,0 +1,57 @@
+<div class="row">
+	<div class="col s12 l12 m12 x12">
+		<h1><%= subject %></h1>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col s12 l12 m12 x12">
+		<p>Escriba una sugerencia para nuestra app o vote por alguna sugerencia abierta. Si su sugerencia es aprobada, ganar&aacute; cr&eacute;ditos.</p>
+		<% if (voteButtonEnabled) { %>
+			<p>Usted tiene <%= votosDisp %> votos disponibles</p>
+		<% } else { %>
+			<p class="red"><small>No tiene votos disponibles. Debe esperar que las sugerencias que vot&oacute; sean aprobadas o descartadas.</small></p>
+		<% } %>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col s12 l12 m12 x12">
+		<table class="table striped">
+			<% for(var i=0; i < tickets.length; i++) { var ticket = tickets[i]; %>
+				<tr >
+					<td>
+						<!--details-->
+						<small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>. Expira el <%= formatDate(ticket.limit_date) %>. Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small>
+						<br/>
+
+						<!--content-->
+						<%= ticket.text.substring(0,100) %>...
+
+						<!--buttons-->
+						<a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">&#x1f50d; Leer</a>
+
+						<% if (voteButtonEnabled == true) { %>
+							<a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">&#x1f44d; Votar</a>
+						<% } %>
+
+					</td>
+				</tr>
+			<% } %>
+		</table>
+	</div>
+</div>
+
+<div class="fixed-action-btn">
+	<a class="btn-floating btn-large green">
+		<i class="large material-icons">more_horiz</i>
+	</a>
+	<ul>
+        <li>
+            <a href="#!" class="btn-floating" onclick="apretaste.send({command: 'SUGERENCIAS CREAR'});"><i class="material-icons left">plus_one</i>Agregar</a>
+        </li>
+        <li>
+            <a href="#!" class="btn-floating" onclick="apretaste.send({command: 'SUGERENCIAS REGLAS'});" ><i class="material-icons left">assignment</i>Reglas</a>
+        </li>
+	</ul>
+</div>
