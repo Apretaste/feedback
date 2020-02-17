@@ -43,6 +43,8 @@ function post(){
   }
   apretaste.send({
     command: 'SUGERENCIAS CREAR',
-    query: text
+    data: {
+      query: text
+    }
   });
 }
