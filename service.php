@@ -45,7 +45,7 @@ class Service {
 		//TODO: send notification here 
 
 		// get list of tickets
-		$tickets = Database::query("SELECT * FROM _sugerencias_list WHERE status='$status' ORDER BY $order ".($limit > -1 ? ' LIMIT 0, 20':''));
+		$tickets = Database::query("SELECT *, (select username from person where person.id = _sugerencias_list.person_id) as username FROM _sugerencias_list WHERE status='$status' ORDER BY $order ".($limit > -1 ? ' LIMIT 0, 20':''));
 
 		// if not suggestion is registered
 		if (empty($tickets)) {
@@ -63,11 +63,6 @@ class Service {
 		// check if vote button should be enabled
 		$availableVotes = $this->getAvailableVotes($request->person->id);
 		$voteButtonEnabled = $availableVotes > 0;
-
-		// get all the user names
-		foreach ($tickets as $ticket) {
-			$ticket->username = $request->person->username;
-		}
 
 		// create response array
 		$responseContent = [
