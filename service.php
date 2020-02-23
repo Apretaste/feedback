@@ -273,6 +273,7 @@ class Service {
 	 * @throws \Framework\Alert
 	 */
 	public function _reglas(Request $request, Response $response) {
+		$response->setCache("year");
 		$response->setTemplate('rules.ejs', []);
 	}
 
