@@ -20,7 +20,7 @@ class Service {
 	 * @throws \Framework\Alert
 	 */
 	public function _main(Request $request, Response $response) {
-		$this->getMainResponse($response, 'Sugerencias abiertas', 'No hay sugerencias registradas', $request, 20, 'NEW');
+		$this->getMainResponse($response, 'Sugerencias', 'No hay sugerencias registradas', $request, 20, 'NEW');
 	}
 
 	/**
