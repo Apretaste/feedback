@@ -11,6 +11,8 @@ function showToast(text) {
 }
 $(function(){
 
+  $('.tabs').tabs();
+
   $('.fixed-action-btn').floatingActionButton({
     direction: 'top',
     hoverEnabled: false
