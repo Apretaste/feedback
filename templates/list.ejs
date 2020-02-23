@@ -29,11 +29,12 @@
                 <div class="card-content">
                     <div class="person-avatar circle" face="<%= ticket.avatar %>" color="<%= ticket.avatarColor %>" size="42"
                          onclick="apretaste.send({'command': 'PIZARRA PERFIL', 'data': {'username':'@<%= ticket.username %>'}});">
-
                     </div>
 
                     <!--details-->
-                    <small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>. Expira el <%= formatDate(ticket.limit_date) %>. Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small>
+                    <p><small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>.</p>
+                    <p>Expira el <%= formatDate(ticket.limit_date) %>. </p>
+                    <p><small>Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small></p>
                     <br/>
                     <%= ticket.text.substring(0,100) %>...
                 </div>
