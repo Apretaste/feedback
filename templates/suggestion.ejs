@@ -1,4 +1,20 @@
 <div class="row">
+    <div class="col s12 l12 m12 x12">
+        <h1>Sugerencia</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <ul class="tabs tabs-fixed-width">
+            <li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS'})">Abiertas</a></li>
+            <li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS REGLAS'})">Reglas</a></li>
+
+        </ul>
+    </div>
+</div>
+
+<div class="row">
 	<div class="col s12 l12 m12 x12">
 	Sugerida por @<%= suggestion.username %><br/>
 	<% if (suggestion.status == "NEW") { %>
@@ -10,18 +26,10 @@
 	</div>
 </div>
 
-<div class="fixed-action-btn">
-	<a class="btn-floating btn-large green">
-		<i class="large material-icons">more_horiz</i>
-	</a>
-	<ul>
-		<% if (voteButtonEnabled) { %>
-        <li>
-            <a href="#!" class="btn-floating" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= suggestion.id %>'}});"><i class="material-icons left">plus_one</i>Votar</a>
-        </li>
-		<% } %>
-        <li>
-            <a href="#!" class="btn-floating" onclick="apretaste.send({command: 'SUGERENCIAS'});" ><i class="material-icons left">keyboard_backspace</i>Atr&aacute;s</a>
-        </li>
-	</ul>
+<% if (voteButtonEnabled) { %>
+<div class="fixed-action-btn hide-on-share">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= suggestion.id %>'}});">
+        <i class="material-icons">plus_one</i>
+    </a>
 </div>
+<% } %>
