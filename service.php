@@ -45,11 +45,11 @@ class Service {
 		//TODO: send notification here 
 
 		// get list of tickets
-		$tickets = Database::query("SELECT *, 
+		$tickets = Database::query("SELECT _sugerencias_list.*, 
        		    person.username,
        			person.avatar,
        			person.avatarColor
-				FROM _sugerencias_list inner join person.id = _sugerencias_list.person_id
+				FROM _sugerencias_list inner join person on person.id = _sugerencias_list.person_id
 				WHERE status='$status' 
 				ORDER BY $order ".($limit > -1 ? ' LIMIT 0, 20':''));
 
