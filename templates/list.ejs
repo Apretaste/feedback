@@ -24,28 +24,22 @@
 
 <div class="row">
 	<div class="col s12 l12 m12 x12">
-		<table class="table striped">
-			<% for(var i=0; i < tickets.length; i++) { var ticket = tickets[i]; %>
-				<tr >
-					<td>
-						<!--details-->
-						<small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>. Expira el <%= formatDate(ticket.limit_date) %>. Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small>
-						<br/>
-
-						<!--content-->
-						<%= ticket.text.substring(0,100) %>...
-
-						<!--buttons-->
-						<a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">&#x1f50d; Leer</a>
-
-						<% if (voteButtonEnabled == true) { %>
-							<a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">&#x1f44d; Votar</a>
-						<% } %>
-
-					</td>
-				</tr>
-			<% } %>
-		</table>
+        <% for(var i=0; i < tickets.length; i++) { var ticket = tickets[i]; %>
+            <div class="card" >
+                <div class="card-content">
+                    <!--details-->
+                    <small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>. Expira el <%= formatDate(ticket.limit_date) %>. Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small>
+                    <br/>
+                    <%= ticket.text.substring(0,100) %>...
+                </div>
+                <div class="card-action">
+                    <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">&#x1f50d; Leer</a>
+                    <% if (voteButtonEnabled == true) { %>
+                        <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">&#x1f44d; Votar</a>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
 	</div>
 </div>
 <div class="fixed-action-btn hide-on-share">
