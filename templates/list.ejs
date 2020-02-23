@@ -27,6 +27,11 @@
         <% for(var i=0; i < tickets.length; i++) { var ticket = tickets[i]; %>
             <div class="card" >
                 <div class="card-content">
+                    <div class="person-avatar circle" face="<%= ticket.avatar %>" color="<%= ticket.avatarColor %>" size="42"
+                         onclick="apretaste.send({'command': 'PIZARRA PERFIL', 'data': {'username':'@<%= ticket.username %>'}});">
+
+                    </div>
+
                     <!--details-->
                     <small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>. Expira el <%= formatDate(ticket.limit_date) %>. Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small>
                     <br/>
