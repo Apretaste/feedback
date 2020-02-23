@@ -32,8 +32,8 @@
                     </div>
 
                     <!--details-->
-                    <p><small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>.</p>
-                    <p>Expira el <%= formatDate(ticket.limit_date) %>. </p>
+                    <p><small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %>" %></a>.</small></p>
+                    <p><small>Expira el <%= formatDate(ticket.limit_date) %>.</small></p>
                     <p><small>Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small></p>
                     <br/>
                     <%= ticket.text.substring(0,100) %>...
