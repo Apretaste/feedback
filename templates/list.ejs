@@ -33,9 +33,9 @@
                     <%= ticket.text.substring(0,100) %>...
                 </div>
                 <div class="card-action">
-                    <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">&#x1f50d; Leer</a>
+                    <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});"><i class="material-icons">zoom_in</i> Leer</a>
                     <% if (voteButtonEnabled == true) { %>
-                        <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">&#x1f44d; Votar</a>
+                        <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});"><i class="material-icons">thumb_up</i> Votar</a>
                     <% } %>
                 </div>
             </div>
