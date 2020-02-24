@@ -261,7 +261,13 @@ class Service {
 		$mensaje = "Su voto ha sido registrado satisfactoriamente. $aux";
 
 		// send response object
-		$response->setTemplate('success.ejs', ['titulo' => 'Voto enviado', 'mensaje' => $mensaje]);
+		$response->setTemplate('message.ejs', [
+		  "header" => "Voto enviado",
+		  "icon" => "sentiment_very_satisfied",
+		  "text" => "Su voyo ha sido guardado satisfactoriamente",
+		  "button" => ["href" => "SUGERENCIAS", "caption" => "Ver sugerencias"]
+		]);
+		//$response->setTemplate('success.ejs', ['titulo' => 'Voto enviado', 'mensaje' => $mensaje]);
 	}
 
 	/**
