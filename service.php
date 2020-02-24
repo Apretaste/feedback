@@ -211,7 +211,7 @@ class Service {
 			$mensaje = 'No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.';
 			$response->setTemplate('message.ejs', [
 			  "header" => "Votaci&oacute;n fallida",
-			  "icon" => "sentiment_very_satisfied",
+			  "icon" => "sentiment_very_dissatisfied",
 			  "text" => "Ya hab&iacute;as votado por esa sugerencia. $mensaje",
 			  "button" => ["href" => "SUGERENCIAS", "caption" => "Ver sugerencias"]
 			]);
