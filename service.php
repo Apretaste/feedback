@@ -1,5 +1,6 @@
 <?php
 
+use Apretaste\Notifications;
 use Apretaste\Person;
 use Apretaste\Request;
 use Apretaste\Response;
@@ -208,13 +209,12 @@ class Service {
 		$res = Database::query("SELECT COUNT(id) as nbr FROM _sugerencias_votes WHERE person_id='{$request->person->id}' AND feedback='{$request->input->data->id}'");
 		if ($res[0]->nbr > 0) {
 			$mensaje = 'No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.';
-			$response->setTemplate('fail.ejs', [
-					'titulo'     => 'Ya votastes por esta idea',
-					'mensaje'    => $mensaje,
-					'buttonNew'  => true,
-					'buttonList' => true
+			$response->setTemplate('message.ejs', [
+			  "header" => "Votaci&oacute;n fallida",
+			  "icon" => "sentiment_very_satisfied",
+			  "text" => "Ya hab&iacute;as votado por esa sugerencia. $mensaje",
+			  "button" => ["href" => "SUGERENCIAS", "caption" => "Ver sugerencias"]
 			]);
-
 			return;
 		}
 
