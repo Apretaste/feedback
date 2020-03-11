@@ -210,10 +210,10 @@ class Service {
 		if ($res[0]->nbr > 0) {
 			$mensaje = 'No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.';
 			$response->setTemplate('message.ejs', [
-			  "header" => "Votaci&oacute;n fallida",
-			  "icon" => "sentiment_very_dissatisfied",
-			  "text" => "Ya hab&iacute;as votado por esa sugerencia. $mensaje",
-			  "button" => ["href" => "SUGERENCIAS", "caption" => "Ver sugerencias"]
+			  'header' => 'Votaci&oacute;n fallida',
+			  'icon' => 'sentiment_very_dissatisfied',
+			  'text' => "Ya hab&iacute;as votado por esa sugerencia. $mensaje",
+			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
 		}
@@ -262,10 +262,10 @@ class Service {
 
 		// send response object
 		$response->setTemplate('message.ejs', [
-		  "header" => "Voto enviado",
-		  "icon" => "sentiment_very_satisfied",
-		  "text" => "Su voyo ha sido guardado satisfactoriamente",
-		  "button" => ["href" => "SUGERENCIAS", "caption" => "Ver sugerencias"]
+		  'header' => 'Voto enviado',
+		  'icon' => 'sentiment_very_satisfied',
+		  'text' => 'Su voto ha sido guardado satisfactoriamente',
+		  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 		]);
 		//$response->setTemplate('success.ejs', ['titulo' => 'Voto enviado', 'mensaje' => $mensaje]);
 	}
@@ -279,7 +279,7 @@ class Service {
 	 * @throws \Framework\Alert
 	 */
 	public function _reglas(Request $request, Response $response) {
-		$response->setCache("year");
+		$response->setCache('year');
 		$response->setTemplate('rules.ejs', []);
 	}
 
