@@ -82,6 +82,7 @@ class Service {
 		//TODO: create paging
 
 		// return response object
+		$response->setCache('hour');
 		$response->setTemplate($tpl, $responseContent);
 	}
 
@@ -96,11 +97,6 @@ class Service {
 
 		if (!isset($request->input->data->query))
 			$request->input->data->query = '';
-
-		if ($request->input->data->query === '') {
-			$response->setTemplate('create.ejs');
-			return;
-		}
 
 		// do not post short suggestions
 		if (strlen($request->input->data->query) <= 10) {

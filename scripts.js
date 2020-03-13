@@ -42,17 +42,37 @@ function formatDateTime(dateStr) {
   return day + ' de ' + months[month] + ' a las ' + hour + ':' + minutes + amOrPm;
 }
 
-function post(){
-  var text = $('#text').val();
+function toggleWriteModal() {
+    var status = $('#writeModal').attr('status');
 
-  if (text.length < 10) {
-    showToast("Escriba un poco mas");
-    return;
-  }
-  apretaste.send({
-    command: 'SUGERENCIAS CREAR',
-    data: {
-      query: text
+    if (status == "closed") {
+        if ($('.container:not(#writeModal) > .row').length == 3) {
+            var h = $('.container:not(#writeModal) > .row')[0].clientHeight;
+            $('#writeModal').css('height', 'calc(100% - ' + h + 'px)');
+        }
+
+        $('#writeModal').slideToggle({
+            direction: "up"
+        }).attr('status', 'opened');
+        $('#note').focus();
+    } else {
+        $('#writeModal').slideToggle({
+            direction: "up"
+        }).attr('status', 'closed');
     }
-  });
+}
+
+function sendNote() {
+    var note = $('#note').val().trim();
+
+    if (note.length >= 20) {
+        apretaste.send({
+            'command': 'SUGERENCIAS CREAR',
+            'data': {
+                'query': note
+            }
+        });
+    } else {
+        showToast('Minimo 10 caracteres');
+    }
 }
