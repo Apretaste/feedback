@@ -55,10 +55,13 @@ function toggleWriteModal() {
             direction: "up"
         }).attr('status', 'opened');
         $('#note').focus();
+
+        $("#createButton").hide();
     } else {
         $('#writeModal').slideToggle({
             direction: "up"
         }).attr('status', 'closed');
+        $("#createButton").show();
     }
 }
 

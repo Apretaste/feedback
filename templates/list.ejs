@@ -6,15 +6,6 @@
         </ul>
     </div>
 </div>
-<div class="row">
-	<div class="col s12 l12 m12 x12">
-		<% if (voteButtonEnabled) { %>
-			<p>Usted tiene <%= votosDisp %> votos disponibles</p>
-		<% } else { %>
-			<p class="red"><small>No tiene votos disponibles. Debe esperar que las sugerencias que vot&oacute; sean aprobadas o descartadas.</small></p>
-		<% } %>
-	</div>
-</div>
 
 <div class="row">
 	<div class="col s12 l12 m12 x12">
@@ -64,7 +55,7 @@
 </div>
 
 <div class="fixed-action-btn hide-on-share">
-    <a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="toggleWriteModal();">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="toggleWriteModal();" id="createButton">
         <i class="material-icons">comment</i>
     </a>
 </div>
