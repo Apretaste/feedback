@@ -6,15 +6,6 @@
         </ul>
     </div>
 </div>
-<div class="row">
-	<div class="col s12 l12 m12 x12">
-		<% if (voteButtonEnabled) { %>
-			<p>Usted tiene <%= votosDisp %> votos disponibles</p>
-		<% } else { %>
-			<p class="red"><small>No tiene votos disponibles. Debe esperar que las sugerencias que vot&oacute; sean aprobadas o descartadas.</small></p>
-		<% } %>
-	</div>
-</div>
 
 <div class="row">
 	<div class="col s12 l12 m12 x12">
@@ -44,17 +35,34 @@
                     </div>
                 </div>
                 <div class="card-action">
-                    <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});"><i class="material-icons">zoom_in</i> Leer</a>
+                    <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">Leer</a>
                     <% if (voteButtonEnabled == true) { %>
-                        <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});"><i class="material-icons">thumb_up</i> Votar</a>
+                        <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">Votar</a>
                     <% } %>
                 </div>
             </div>
         <% } %>
 	</div>
 </div>
+<div id="writeModal" class="container" status="closed" style="display: none;">
+    <div class="row">
+        <i class="material-icons small" onclick="toggleWriteModal()">close</i>
+        <div class="col s12">
+            <% if (voteButtonEnabled) { %>
+                <p>Usted tiene <%= votosDisp %> votos disponibles</p>
+            <% } else { %>
+                <p class="red"><small>No tiene votos disponibles. Debe esperar que las sugerencias que vot&oacute; sean aprobadas o descartadas.</small></p>
+            <% } %>
+            <textarea id="note" class="materialize-textarea" maxlength="300" placeholder="Sugerencia"></textarea>
+        </div>
+        <div class="actions">
+            <i class="material-icons small pizarra-color-text right" onclick="sendNote()">send</i>
+        </div>
+    </div>
+</div>
+
 <div class="fixed-action-btn hide-on-share">
-    <a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="apretaste.send({'command':'SUGERENCIAS CREAR'})">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="toggleWriteModal();" id="createButton">
         <i class="material-icons">comment</i>
     </a>
 </div>

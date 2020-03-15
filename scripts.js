@@ -37,9 +37,10 @@ function formatDateTime(dateStr) {
   return day + ' de ' + months[month] + ' a las ' + hour + ':' + minutes + amOrPm;
 }
 
-function post(){
-  var text = $('#text').val();
+function toggleWriteModal() {
+    var status = $('#writeModal').attr('status');
 
+<<<<<<< HEAD
   if (text.length < 10) {
     M.toast({html: "Escriba un poco mas"});
     return;
@@ -48,6 +49,39 @@ function post(){
     command: 'SUGERENCIAS CREAR',
     data: {
       query: text
+=======
+    if (status == "closed") {
+        if ($('.container:not(#writeModal) > .row').length == 3) {
+            var h = $('.container:not(#writeModal) > .row')[0].clientHeight;
+            $('#writeModal').css('height', 'calc(100% - ' + h + 'px)');
+        }
+
+        $('#writeModal').slideToggle({
+            direction: "up"
+        }).attr('status', 'opened');
+        $('#note').focus();
+
+        $("#createButton").hide();
+    } else {
+        $('#writeModal').slideToggle({
+            direction: "up"
+        }).attr('status', 'closed');
+        $("#createButton").show();
     }
-  });
+}
+
+function sendNote() {
+    var note = $('#note').val().trim();
+
+    if (note.length >= 20) {
+        apretaste.send({
+            'command': 'SUGERENCIAS CREAR',
+            'data': {
+                'query': note
+            }
+        });
+    } else {
+        showToast('Minimo 10 caracteres');
+>>>>>>> 449395920de8bb13da3f128be08fc35280b718c4
+    }
 }
