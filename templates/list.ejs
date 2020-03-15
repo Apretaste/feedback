@@ -29,9 +29,11 @@
                         </div>
                         <div class="col l11 s10 xk11 m11">
                             <!--details-->
-                            <p><small>Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %></a></small></p>
-                            <p><small>Expira el <%= formatDate(ticket.limit_date) %>.</small></p>
-                            <p><small>Faltan <%= ticket.limit_votes - ticket.votes_count %> votos</small></p>
+                            <p><small>
+                                Creada por <a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});" >@<%= ticket.username %></a><br/>
+                                Expira el <%= formatDate(ticket.limit_date) %>.<br/>
+                                Faltan <%= ticket.limit_votes - ticket.votes_count %> votos
+                            </small></p>
                         </div>
                     </div>
 

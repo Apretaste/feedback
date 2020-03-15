@@ -4,13 +4,8 @@ function pad(n, width, z) {
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
-function showToast(text) {
-  M.toast({
-    html: text
-  });
-}
-$(function(){
 
+$(function(){
   $('.tabs').tabs();
 
   $('.fixed-action-btn').floatingActionButton({
@@ -46,7 +41,7 @@ function post(){
   var text = $('#text').val();
 
   if (text.length < 10) {
-    showToast("Escriba un poco mas");
+    M.toast({html: "Escriba un poco mas"});
     return;
   }
   apretaste.send({
