@@ -8,22 +8,54 @@ use Framework\Database;
 
 class Service
 {
-	private $CREDITS_X_APPROVED = 5;
-	private $CREDITS_X_VOTE = 0.5;
-	private $MAX_VOTES_X_USER = 5;
 
-	/**Esto parece un servicio hecho corriendo, sorry pero hace falta que NO HAGAS LAS COSAS CORRIENDO Y TE FIJES EN LO QUE HACES 😞
+	private int $CREDITS_X_APPROVED = 5;
+	private float $CREDITS_X_VOTE = 0.5;
+	private int $MAX_VOTES_X_USER = 5;
 
-D, [15.03.20 14:21]
-Me ha tomado 3h revisar tu codigo. Realmente hubiera sido mas rapido hacerlo yo. Cuando no trabajas bien, me haces perder mi tiempo y pierdes el tuyo. Por favor haz las cosas con calidad y no trabajes corriendo para matar tareas y cumplir objetivos. Si crees que algo no saldra a tiempo dime y nos ponemos de acuerdo en los objetivos, pero no hagas mas las cosas corriendo.
+	/**
 	 * Function executed when the service is called
 	 *
-	 * @param Request  $request
-	 * @param Response $response
+	 * @param  Request  $request
+	 * @param  Response  $response
+	 *
 	 * @return void
+	 * @throws \Framework\Alert
 	 */
 	public function _main(Request $request, Response $response) {
-		$this->getMainResponse($response, '', 'No hay sugerencias registradas', $request, 20, 'NEW');
+
+		// discard suggestions that run out of time
+		Database::query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date <= CURRENT_TIMESTAMP AND status = 'NEW'");
+
+		// get list of tickets
+		$tickets = Database::query("SELECT A.*, B.username, B.avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'NEW' ORDER BY votes_count DESC LIMIT 0, 20");
+
+		// if not suggestion is registered
+		if (empty($tickets)) {
+			$response->setTemplate('fail.ejs', [
+			  'titulo'  => 'No hay sugerencias registradas',
+			  'mensaje' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
+			  'buttonNew' => true,
+			  'buttonList' => false
+			]);
+			return;
+		}
+
+		// check if vote button should be enabled
+		$availableVotes = $this->getAvailableVotes($request->person->id);
+		$voteButtonEnabled = $availableVotes > 0;
+
+		// create response array
+		$responseContent = [
+		  'subject' => '',
+		  'tickets' => $tickets,
+		  'votosDisp' => $availableVotes,
+		  'voteButtonEnabled' => $voteButtonEnabled
+		];
+
+		// return response object
+		$response->setCache('hour');
+		$response->setTemplate('list.ejs', $responseContent);
 	}
 
 	/**
