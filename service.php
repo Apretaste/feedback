@@ -12,7 +12,10 @@ class Service
 	private $CREDITS_X_VOTE = 0.5;
 	private $MAX_VOTES_X_USER = 5;
 
-	/**
+	/**Esto parece un servicio hecho corriendo, sorry pero hace falta que NO HAGAS LAS COSAS CORRIENDO Y TE FIJES EN LO QUE HACES 😞
+
+D, [15.03.20 14:21]
+Me ha tomado 3h revisar tu codigo. Realmente hubiera sido mas rapido hacerlo yo. Cuando no trabajas bien, me haces perder mi tiempo y pierdes el tuyo. Por favor haz las cosas con calidad y no trabajes corriendo para matar tareas y cumplir objetivos. Si crees que algo no saldra a tiempo dime y nos ponemos de acuerdo en los objetivos, pero no hagas mas las cosas corriendo.
 	 * Function executed when the service is called
 	 *
 	 * @param Request  $request
@@ -26,14 +29,16 @@ class Service
 	/**
 	 * Common response for some requests
 	 *
-	 * @param Response $response
-	 * @param string $subject
-	 * @param string $no_subject
-	 * @param Request $request
-	 * @param int $limit
-	 * @param string $status
-	 * @param string $order
-	 * @param string $tpl
+	 * @param  Response  $response
+	 * @param  string  $subject
+	 * @param  string  $no_subject
+	 * @param  Request  $request
+	 * @param  int  $limit
+	 * @param  string  $status
+	 * @param  string  $order
+	 * @param  string  $tpl
+	 *
+	 * @throws \Framework\Alert
 	 */
 	private function getMainResponse(Response $response, $subject, $no_subject, Request $request, $limit = 20, $status = 'NEW', $order = 'votes_count DESC', $tpl = 'list.ejs')
 	{
