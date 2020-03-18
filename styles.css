@@ -45,3 +45,7 @@
 .upper-text{
     text-transform: uppercase;
 }
+
+.bottom-space {
+    margin-bottom: 60px;
+}
