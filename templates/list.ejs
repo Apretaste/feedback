@@ -39,7 +39,7 @@
                      <% if (voteButtonEnabled) { %>
                         <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">Votar (<%= votosDisp %>)</a>
                     <% } else { %>
-                        Votar (0)
+                        <span style="text-transform: uppercase; color:#eeeeee;">Votar (0)</span>
                     <% } %>
                 </div>
             </div>
