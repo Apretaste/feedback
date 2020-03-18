@@ -36,7 +36,10 @@
                 </div>
                 <div class="card-action">
                     <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});" >Leer</a>
-                    <a href="#!" <% if (voteButtonEnabled) { %> onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});" <% } else { %> class="disabled" <% } %>>Votar (<%= votosDisp %>)</a>
+                     <% if (voteButtonEnabled) { %>
+                        <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">Votar (<%= votosDisp %>)</a>
+                    <% } else { %>
+                        Votar (0)
                 </div>
             </div>
         <% } %>
