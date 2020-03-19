@@ -157,7 +157,7 @@ class Service
 			VALUES ('{$request->person->id}', '{$request->input->data->query}', '$limitVotes', '$deadline')");
 
 		// create response
-		$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya está visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos o más en un plazo de 15 días, será aprobada y todos ganarán cr&eacute;ditos.";
+		$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya está visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos o más en un plazo de 15 días, será aprobada y todos ganarán créditos.";
 
 		$response->setTemplate('success.ejs', [
 			'titulo' => 'Sugerencia recibida',
