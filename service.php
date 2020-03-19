@@ -177,18 +177,15 @@ class Service
 	{
 		// get the suggestion
 		$suggestion = Database::query("
-			SELECT *, (SELECT username FROM person WHERE person.id = _sugerencias_list.person_id) AS username 
-			FROM _sugerencias_list 
-			WHERE id = '{$request->input->data->id}'");
+			SELECT _sugerencias_list.*, person.username, person.avatar, person.avatarColor 
+			FROM _sugerencias_list inner join person on person.id =  _sugerencias_list.person_id
+			WHERE _sugerencias_list.id = '{$request->input->data->id}'");
 
 		if (empty($suggestion)) {
 			return;
 		}
 
 		$suggestion = $suggestion[0];
-
-		// get the username who created the suggestion
-		$user = Person::find($suggestion->person_id);
 
 		// check if vote button should be enabled
 		$availableVotes = $this->getAvailableVotes($request->person->id);
@@ -199,7 +196,6 @@ class Service
 		if ($suggestion->status==='APPROVED') $suggestion->estado = 'APROVADA';
 		if ($suggestion->status==='DISCARDED') $suggestion->estado = 'RECHAZADA';
 
-		// return response object
 		$response->setTemplate('suggestion.ejs', [
 			'suggestion' => $suggestion,
 			'voteButtonEnabled' => $voteButtonEnabled,
