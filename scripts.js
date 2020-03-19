@@ -12,10 +12,12 @@ $(function(){
 });
 
 function formatDate(dateStr) {
+    moment.locale("es");
     return moment(dateStr).format('DD/MM/YYYY');
 }
 
 function formatDateTime(dateStr) {
+    moment.locale("es");
     return moment(dateStr).format('D [de] MMMM [del] YYYY [a las] h:mm A');
 }
 
