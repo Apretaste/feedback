@@ -237,10 +237,10 @@ class Service
 		if ($res[0]->nbr > 0) {
 			$mensaje = 'No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.';
 			$response->setTemplate('message.ejs', [
-				"header" => "Votación fallida",
-				"icon" => "sentiment_very_dissatisfied",
-				"text" => "Ya habías votado por esa sugerencia. $mensaje",
-				"button" => ["href" => "SUGERENCIAS", "caption" => "Ver sugerencias"]
+				'header' => 'Votación fallida',
+				'icon' => 'sentiment_very_dissatisfied',
+				'text' => "Ya habías votado por esa sugerencia. $mensaje",
+				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
 		}
@@ -280,18 +280,19 @@ class Service
 		// create message to send to the user
 		$votosDisp--;
 		if ($votosDisp > 0) {
-			$aux = "Aún le queda(n) $votosDisp voto(s) disponible(s). Si lo desea, puede votar por otra sugerencia de la lista.";
+			$aux = "Le quedan $votosDisp votos. Cuando las ideas que apoyó ganan o pierdan, usted recuperará sus votos";
 		} else {
 			$aux = 'Ya no tiene ningún voto disponible. Ahora debe esperar a que sean aprobadas o descartadas las sugerencias por las cuales votó para poder votar por algúna otra.';
 		}
+
 		$mensaje = "Su voto ha sido registrado satisfactoriamente. $aux";
 
 		// send response object
 		$response->setTemplate('message.ejs', [
-			"header" => "Voto enviado",
-			"icon" => "sentiment_very_satisfied",
-			"text" => "Su voyo ha sido guardado satisfactoriamente",
-			"button" => ["href" => "SUGERENCIAS", "caption" => "Ver sugerencias"]
+			'header' => 'Voto enviado',
+			'icon' => 'sentiment_very_satisfied',
+			'text' => $mensaje,
+			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 		]);
 		//$response->setTemplate('success.ejs', ['titulo' => 'Voto enviado', 'mensaje' => $mensaje]);
 	}
@@ -299,20 +300,24 @@ class Service
 	/**
 	 * Read the rules of the game
 	 *
-	 * @param Request $request
-	 * @param Response $response
+	 * @param  Request  $request
+	 * @param  Response  $response
+	 *
+	 * @throws \Framework\Alert
 	 */
 	public function _reglas(Request $request, Response $response)
 	{
-		$response->setCache("year");
+		$response->setCache('year');
 		$response->setTemplate('rules.ejs', []);
 	}
 
 	/**
 	 * Return all suggestions
 	 *
-	 * @param Request $request
-	 * @param Response $response
+	 * @param  Request  $request
+	 * @param  Response  $response
+	 *
+	 * @throws \Framework\Alert
 	 */
 	public function _todas(Request $request, Response $response)
 	{
