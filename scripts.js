@@ -1,5 +1,7 @@
 $(function(){
 
+    moment.locale("es");
+
     $('.tabs').tabs();
 
     $('.fixed-action-btn').floatingActionButton({
