@@ -168,8 +168,10 @@ class Service
 	/**
 	 * Display a full ticket
 	 *
-	 * @param Request $request
+	 * @param  Request  $request
+	 *
 	 * @return Response|void
+	 * @throws \Framework\Alert
 	 */
 	public function _ver(Request $request, Response $response)
 	{
@@ -189,8 +191,8 @@ class Service
 		$user = Person::find($suggestion->person_id);
 
 		// check if vote button should be enabled
-		$votosDisp = $this->getAvailableVotes($request->person->id);
-		$voteButtonEnabled = $votosDisp > 0 && $suggestion->status==='NEW';
+		$availableVotes = $this->getAvailableVotes($request->person->id);
+		$voteButtonEnabled = $availableVotes > 0 && $suggestion->status==='NEW';
 
 		// translate the status varible
 		if ($suggestion->status==='NEW') $suggestion->estado = 'PENDIENTE';
@@ -200,7 +202,8 @@ class Service
 		// return response object
 		$response->setTemplate('suggestion.ejs', [
 			'suggestion' => $suggestion,
-			'voteButtonEnabled' => $voteButtonEnabled
+			'voteButtonEnabled' => $voteButtonEnabled,
+		  	'votosDisp' => $availableVotes
 		]);
 	}
 
