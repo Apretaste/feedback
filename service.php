@@ -292,7 +292,7 @@ class Service
 			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 		]);
 
-		Notifications::alert($suggestion->person_id, "El usuario @{$request->person->username} ha votado por tu sugerencia", '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->query.'"}}');
+		Notifications::alert($suggestion->person_id, "El usuario @{$request->person->username} ha votado por tu sugerencia", '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->id.'"}}');
 	}
 
 	/**
