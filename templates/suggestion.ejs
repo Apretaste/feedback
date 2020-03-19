@@ -12,7 +12,7 @@
 
     	<p style="background-color:#F2F2F2; padding:10px;"><big><%= suggestion.text %></big></p>
         <% if (voteButtonEnabled) { %>
-            <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">Votar (<%= votosDisp %>)</a>
+            <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= suggestion.id %>'}});">Votar (<%= votosDisp %>)</a>
         <% } else { %>
             <span class="upper-text gray">Votar (0)</span>
         <% } %>
