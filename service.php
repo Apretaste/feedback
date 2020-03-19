@@ -291,7 +291,8 @@ class Service
 			'text' => $mensaje,
 			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 		]);
-		//$response->setTemplate('success.ejs', ['titulo' => 'Voto enviado', 'mensaje' => $mensaje]);
+
+		Notifications::alert($suggestion->person_id, "El usuario @{$request->person->username} ha votado por tu sugerencia", '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->query.'"}}');
 	}
 
 	/**
