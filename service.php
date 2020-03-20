@@ -15,6 +15,14 @@ class Service
 	private int $MAX_VOTES_X_USER = 5;
 
 	/**
+	 * @throws \Framework\Alert
+	 */
+	private function discardSuggestions() {
+		// discard suggestions that run out of time
+		Database::query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date <= CURRENT_TIMESTAMP AND status = 'NEW'");
+	}
+
+	/**
 	 * Function executed when the service is called
 	 *
 	 * @param  Request  $request
@@ -25,8 +33,7 @@ class Service
 	 */
 	public function _main(Request $request, Response $response) {
 
-		// discard suggestions that run out of time
-		Database::query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date <= CURRENT_TIMESTAMP AND status = 'NEW'");
+		$this->discardSuggestions();
 
 		// get list of tickets
 		$tickets = Database::query("SELECT A.*, B.username, B.avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'NEW' ORDER BY votes_count DESC LIMIT 0, 20");
@@ -60,73 +67,11 @@ class Service
 	}
 
 	/**
-	 * Common response for some requests
-	 *
-	 * @param  Response  $response
-	 * @param  string  $subject
-	 * @param  string  $no_subject
-	 * @param  Request  $request
-	 * @param  int  $limit
-	 * @param  string  $status
-	 * @param  string  $order
-	 * @param  string  $tpl
-	 *
-	 * @throws \Framework\Alert
-	 */
-	private function getMainResponse(Response $response, $subject, $no_subject, Request $request, $limit = 20, $status = 'NEW', $order = 'votes_count DESC', $tpl = 'list.ejs')
-	{
-		// discard suggestions that run out of time
-		Database::query("
-			UPDATE _sugerencias_list 
-			SET status='DISCARDED', updated=CURRENT_TIMESTAMP 
-			WHERE limit_date <= CURRENT_TIMESTAMP 
-			AND status = 'NEW'");
-
-		// get list of tickets
-		$limitSQL = $limit > -1 ? ' LIMIT 0, 20' : '';
-		$tickets = Database::query("
-			SELECT A.*, B.username, B.avatar, B.avatarColor
-			FROM _sugerencias_list A
-			INNER JOIN person B
-			ON A.person_id = B.id
-			WHERE status = '$status' 
-			ORDER BY $order 
-			$limitSQL");
-
-		// if not suggestion is registered
-		if (empty($tickets)) {
-			$message = 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.';
-			$response->setTemplate('fail.ejs', [
-				'titulo'  => $no_subject,
-				'mensaje' => $message,
-				'buttonNew' => true,
-				'buttonList' => false
-			]);
-			return;
-		}
-
-		// check if vote button should be enabled
-		$availableVotes = $this->getAvailableVotes($request->person->id);
-		$voteButtonEnabled = $availableVotes > 0;
-
-		// create response array
-		$responseContent = [
-			'subject' => $subject,
-			'tickets' => $tickets,
-			'votosDisp' => $availableVotes,
-			'voteButtonEnabled' => $voteButtonEnabled
-		];
-
-		// return response object
-		$response->setCache('hour');
-		$response->setTemplate($tpl, $responseContent);
-	}
-
-	/**
 	 * Sub-service ver, Display a full ticket
 	 *
 	 * @param Request $request
-	 *
+	 * @param Response $response
+	 * @throws \Framework\Alert
 	 */
 	public function _crear(Request $request, Response $response)
 	{
@@ -319,7 +264,38 @@ class Service
 	 */
 	public function _todas(Request $request, Response $response)
 	{
-		$this->getMainResponse($response, 'Todas las sugerencias recibidas', 'No hay sugerencias registradas', $request, -1);
+		$this->discardSuggestions();
+
+		// get list of tickets
+		$tickets = Database::query("SELECT A.*, B.username, B.avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id ORDER BY votes_count DESC");
+
+		// if not suggestion is registered
+		if (empty($tickets)) {
+			$message = 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.';
+			$response->setTemplate('fail.ejs', [
+				'titulo'  => 'No hay sugerencias registradas',
+				'mensaje' => $message,
+				'buttonNew' => true,
+				'buttonList' => false
+			]);
+			return;
+		}
+
+		// check if vote button should be enabled
+		$availableVotes = $this->getAvailableVotes($request->person->id);
+		$voteButtonEnabled = $availableVotes > 0;
+
+		// create response array
+		$responseContent = [
+			'subject' => 'Todas las sugerencias recibidas',
+			'tickets' => $tickets,
+			'votosDisp' => $availableVotes,
+			'voteButtonEnabled' => $voteButtonEnabled
+		];
+
+		// return response object
+		$response->setCache('hour');
+		$response->setTemplate("list.ejs", $responseContent);
 	}
 
 	/**
@@ -328,10 +304,41 @@ class Service
 	 * @param Request $request
 	 * @param Response $response
 	 * @return void
+	 * @throws \Framework\Alert
 	 */
 	public function _aprobadas(Request $request, Response $response)
 	{
-		$this->getMainResponse($response, 'Lista de sugerencias aprobadas', 'No hay sugerencias aprobadas', $request, -1, 'APPROVED', 'updated DESC', 'approved.ejs');
+		$this->discardSuggestions();
+
+		// get list of tickets
+		$tickets = Database::query("SELECT A.*, B.username, B.avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'APPROVED' ORDER BY updated DESC LIMIT 0, 20");
+
+		// if not suggestion is registered
+		if (empty($tickets)) {
+			$response->setTemplate('fail.ejs', [
+				'titulo'  => 'No hay sugerencias aprobadas',
+				'mensaje' => 'Actualmente no hay registrada ninguna aprobada.',
+				'buttonNew' => true,
+				'buttonList' => false
+			]);
+			return;
+		}
+
+		// check if vote button should be enabled
+		$availableVotes = $this->getAvailableVotes($request->person->id);
+		$voteButtonEnabled = $availableVotes > 0;
+
+		// create response array
+		$responseContent = [
+			'subject' => 'Lista de sugerencias aprobadas',
+			'tickets' => $tickets,
+			'votosDisp' => $availableVotes,
+			'voteButtonEnabled' => $voteButtonEnabled
+		];
+
+		// return response object
+		$response->setCache('hour');
+		$response->setTemplate('approved.ejs', $responseContent);
 	}
 
 	/**
@@ -339,6 +346,7 @@ class Service
 	 *
 	 * @param $personId
 	 * @return int
+	 * @throws \Framework\Alert
 	 */
 	private function getAvailableVotes($personId) {
 		$res = Database::query("SELECT COUNT(*) AS nbr FROM _sugerencias_votes WHERE person_id = '$personId'");
