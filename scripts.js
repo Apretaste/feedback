@@ -55,3 +55,15 @@ function sendNote() {
         M.toast({html: "Escriba un poco mas"});
     }
 }
+
+function cmpTabs(active) {
+    return '<div class = "row">\n' +
+        '<div class = "col s12">\n' +
+        '<ul class = "tabs tabs-fixed-width">\n' +
+        '<li class = "tab"><a href = "#" ' + (active == 1 ? 'class="active"' : 'onclick = "apretaste.send({command: \'SUGERENCIAS\'})"') + '>Abiertas</a></li>\n' +
+        '<li class = "tab"><a href = "#" ' + (active == 2 ? 'class="active"' : 'onclick = "apretaste.send({command: \'SUGERENCIAS APROBADAS\'})"') + '>Aprobadas</a></li>\n' +
+        '<li class = "tab"><a href = "#" ' + (active == 3 ? 'class="active"' : 'onclick = "apretaste.send({command: \'SUGERENCIAS REGLAS\'})"') + '>Reglas</a></li>\n' +
+        '</ul>\n' +
+        '</div>\n' +
+        '</div>'
+}

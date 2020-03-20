@@ -41,6 +41,7 @@ class Service
 		// if not suggestion is registered
 		if (empty($tickets)) {
 			$response->setTemplate('fail.ejs', [
+			   'activeTab' => 1,
 			  'titulo'  => 'No hay sugerencias registradas',
 			  'mensaje' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
 			  'buttonNew' => true,
@@ -81,6 +82,7 @@ class Service
 		// do not post short suggestions
 		if (strlen($request->input->data->query) <= 10) {
 			$response->setTemplate('fail.ejs', [
+				'activeTab' => 1,
 				'titulo'  => 'Sugerencia no válida.',
 				'mensaje' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
 				'buttonNew' => true,
@@ -170,6 +172,7 @@ class Service
 		$votosDisp = $this->getAvailableVotes($request->person->id);
 		if ($votosDisp <= 0) {
 			$response->setTemplate('fail.ejs', [
+				'activeTab' => 1,
 				'titulo'  => 'No puedes votar por ahora.',
 				'mensaje' => 'No tienes ningún voto disponible. Debes esperar a que sean aprobadas o descartadas las sugerencias por las que votaste para poder votar por algúna otra. Mientras tanto, puedes ver la lista de sugerencias disponibles o escribir una nueva sugerencia.',
 				'buttonNew' => true,
@@ -273,6 +276,7 @@ class Service
 		if (empty($tickets)) {
 			$message = 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.';
 			$response->setTemplate('fail.ejs', [
+				'activeTab' => 1,
 				'titulo'  => 'No hay sugerencias registradas',
 				'mensaje' => $message,
 				'buttonNew' => true,
@@ -316,6 +320,7 @@ class Service
 		// if not suggestion is registered
 		if (empty($tickets)) {
 			$response->setTemplate('fail.ejs', [
+				'activeTab' => 2,
 				'titulo'  => 'No hay sugerencias aprobadas',
 				'mensaje' => 'Actualmente no hay registrada ninguna aprobada.',
 				'buttonNew' => true,
