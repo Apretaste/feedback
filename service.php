@@ -107,9 +107,11 @@ class Service
 		// create response
 		$mensaje = "Su sugerencia ha sido registrada satisfactoriamente. Ya está visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos o más en un plazo de 15 días, será aprobada y todos ganarán créditos.";
 
-		$response->setTemplate('success.ejs', [
-			'titulo' => 'Sugerencia recibida',
-			'mensaje' => $mensaje
+		$response->setTemplate('message.ejs', [
+		  'header' => 'Sugerencia recibida',
+		  'icon' => 'sentiment_very_satisfied',
+		  'text' => $mensaje,
+		  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 		]);
 	}
 
