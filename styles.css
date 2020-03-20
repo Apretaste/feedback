@@ -55,9 +55,3 @@ ul.rules > li  {
     margin-left: 2rem;
     margin-bottom: 1rem;
 }
-
-p#nochats {
-     position: absolute;
-     top: 50%;
-     left: calc(50% - 160px);
- }
