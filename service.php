@@ -63,7 +63,7 @@ class Service
 		];
 
 		// return response object
-		$response->setCache('hour');
+		//$response->setCache('hour');
 		$response->setTemplate('list.ejs', $responseContent);
 	}
 
@@ -298,7 +298,7 @@ class Service
 		];
 
 		// return response object
-		$response->setCache('hour');
+		//$response->setCache('hour');
 		$response->setTemplate("list.ejs", $responseContent);
 	}
 
