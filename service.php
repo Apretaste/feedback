@@ -342,7 +342,7 @@ class Service
 		];
 
 		// return response object
-		$response->setCache('hour');
+		//$response->setCache('hour');
 		$response->setTemplate('approved.ejs', $responseContent);
 	}
 
