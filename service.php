@@ -42,7 +42,8 @@ class Service
 		if (empty($tickets)) {
 			$response->setTemplate('message.ejs', [
 			  'header' => 'No hay sugerencias registradas',
-			  'icon' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
+			  'icon' => 'sentiment_dissatisfied',
+			  'message' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
 			  'newButton' => true,
 			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
@@ -82,7 +83,8 @@ class Service
 		if (strlen($request->input->data->query) <= 10) {
 			$response->setTemplate('message.ejs', [
 			  'header' => 'Sugerencia no válida.',
-			  'icon' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
+			  'icon' => 'sentiment_dissatisfied',
+			  'message' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
 			  'newButton' => true,
 			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
@@ -173,7 +175,7 @@ class Service
 		if ($votosDisp <= 0) {
 			$response->setTemplate('message.ejs', [
 			  'header' => 'No puedes votar por ahora.',
-			  'icon' => 'sentiment_very_unssatisfied',
+			  'icon' => 'sentiment_dissatisfied',
 			  'text' => 'No tienes ningún voto disponible. Debes esperar a que sean aprobadas o descartadas las sugerencias por las que votaste para poder votar por algúna otra. Mientras tanto, puedes ver la lista de sugerencias disponibles o escribir una nueva sugerencia.',
 			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
@@ -186,7 +188,7 @@ class Service
 			$mensaje = 'No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.';
 			$response->setTemplate('message.ejs', [
 				'header' => 'Votación fallida',
-				'icon' => 'sentiment_very_dissatisfied',
+				'icon' => 'sentiment_dissatisfied',
 				'text' => "Ya habías votado por esa sugerencia. $mensaje",
 				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
@@ -275,7 +277,7 @@ class Service
 		if (empty($tickets)) {
 			$response->setTemplate('message.ejs', [
 			  'header' => 'No hay sugerencias registradas',
-			  'icon' => 'sentiment_very_unssatisfied',
+			  'icon' => 'sentiment_dissatisfied',
 			  'text' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
 			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
@@ -318,7 +320,7 @@ class Service
 		if (empty($tickets)) {
 			$response->setTemplate('message.ejs', [
 			  'header' => 'No hay sugerencias aprobadas',
-			  'icon' => 'sentiment_very_unssatisfied',
+			  'icon' => 'sentiment_dissatisfied',
 			  'text' => 'Actualmente no hay registrada ninguna aprobada.',
 			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
