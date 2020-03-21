@@ -37,7 +37,7 @@ class Service
 		$this->discardSuggestions();
 
 		// get list of tickets
-		$tickets = Database::query("SELECT A.*, B.username, B.avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'NEW' ORDER BY votes_count DESC LIMIT 0, 20");
+		$tickets = Database::query("SELECT A.*, B.username, coalesce(case when B.avatar = '' then null else B.avatar end,'apretin'), B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'NEW' ORDER BY votes_count DESC LIMIT 0, 20");
 
 		// if not suggestion is registered
 		if (empty($tickets)) {
