@@ -1,14 +1,6 @@
 $(function(){
-
     moment.locale("es");
-
     $('.tabs').tabs();
-
-    $('.fixed-action-btn').floatingActionButton({
-        direction: 'top',
-        hoverEnabled: false
-    });
-
 });
 
 function formatDate(dateStr) {
