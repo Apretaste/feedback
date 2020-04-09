@@ -142,7 +142,7 @@ class Service
 			$suggestion->estado = 'PENDIENTE';
 		}
 		if ($suggestion->status === 'APPROVED') {
-			$suggestion->estado = 'APROVADA';
+			$suggestion->estado = 'APROBADA';
 		}
 		if ($suggestion->status === 'DISCARDED') {
 			$suggestion->estado = 'RECHAZADA';
@@ -165,7 +165,7 @@ class Service
 	public function _votar(Request $request, Response $response)
 	{
 		// do not let pass without ID, and get the suggestion for later
-		$suggestion = Database::query("SELECT `person_id`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->input->data->id}");
+		$suggestion = Database::query("SELECT `person_id`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->input->data->id} AND status='NEW'");
 		if (empty($suggestion)) {
 			return;
 		}
@@ -205,7 +205,7 @@ class Service
 		// check if the idea reached the number of votes to be approved
 		if ($suggestion->votes_count + 1 >= $suggestion->limit_votes) {
 			// asign credits to the creator and send a notification
-			Money::send(Money::BANK, $suggestion->person_id, $this->CREDITS_X_APPROVED, 'sugerencia aprovada');
+			Money::send(Money::BANK, $suggestion->person_id, $this->CREDITS_X_APPROVED, 'sugerencia aprobada');
 
 			$msg = "Una sugerencia suya ha sido aprobada y usted gano §{$this->CREDITS_X_APPROVED}. Gracias!";
 			Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->query.'"}}');
