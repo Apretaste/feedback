@@ -77,7 +77,7 @@ class Service
 	public function _crear(Request $request, Response $response)
 	{
 		if (!isset($request->input->data->query)) {
-			$request->input->data->query = '';
+			return;
 		}
 
 		// do not post short suggestions
@@ -121,6 +121,10 @@ class Service
 	 */
 	public function _ver(Request $request, Response $response)
 	{
+		if (!isset($request->input->data->id)) {
+			return;
+		}
+
 		// get the suggestion
 		$suggestion = Database::query("
 			SELECT _sugerencias_list.*, person.username, person.avatar, person.avatarColor 
@@ -164,6 +168,10 @@ class Service
 	 */
 	public function _votar(Request $request, Response $response)
 	{
+		if (!isset($request->input->data->id)) {
+			return;
+		}
+
 		// do not let pass without ID, and get the suggestion for later
 		$suggestion = Database::query("SELECT `person_id`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->input->data->id} AND status='NEW'");
 		if (empty($suggestion)) {
@@ -208,15 +216,19 @@ class Service
 			Money::send(Money::BANK, $suggestion->person_id, $this->CREDITS_X_APPROVED, 'sugerencia aprobada');
 
 			$msg = "Una sugerencia suya ha sido aprobada y usted gano §{$this->CREDITS_X_APPROVED}. Gracias!";
-			Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->query.'"}}');
+			Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->id.'"}}');
 
 			// get all the people who voted for the suggestion
 			$voters = Database::query("SELECT `person_id`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->input->data->id}");
 
 			// asign credits to the voters and send a notification
 			foreach ($voters as $voter) {
-				Money::send(Money::BANK, $voter->person_id, $this->CREDITS_X_VOTE,
-				  'VOTO A SUGERENCIA APROBADA');
+				Money::send(
+					Money::BANK,
+					$voter->person_id,
+					$this->CREDITS_X_VOTE,
+					'VOTO A SUGERENCIA APROBADA'
+				);
 
 				$msg = "Usted voto por una sugerencia que ha sido aprobada y por lo tanto gano §{$this->CREDITS_X_VOTE}";
 				Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$voter->feedback.'"}}');
