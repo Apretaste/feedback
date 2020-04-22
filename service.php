@@ -36,7 +36,7 @@ class Service
 	{
 		$this->discardSuggestions();
 
-		$page = $this->request->input->page ?? 1;
+		$page = $request->input->data->page ?? 1;
 		$page--;
 		$offset = $page * 10;
 
@@ -58,6 +58,8 @@ class Service
 		// check if vote button should be enabled
 		$availableVotes = $this->getAvailableVotes($request->person->id);
 		$voteButtonEnabled = $availableVotes > 0;
+
+		if ($pages > $page + 5) $pages = $page + 5;
 
 		// create response array
 		$responseContent = [
