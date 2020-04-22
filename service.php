@@ -49,7 +49,7 @@ class Service
 			$response->setTemplate('message.ejs', [
 				'header' => 'No hay sugerencias registradas',
 				'icon' => 'sentiment_dissatisfied',
-				'message' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
+				'text' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
 				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
@@ -94,7 +94,7 @@ class Service
 			$response->setTemplate('message.ejs', [
 				'header' => 'Sugerencia no válida.',
 				'icon' => 'sentiment_dissatisfied',
-				'message' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
+				'text' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
 				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
