@@ -64,7 +64,7 @@
                     onclick="<%= beforeActive ? "apretaste.send({command: 'SUGERENCIAS', data: {page: '" + (currentPage - 1) + "'}})" : "" %>">
                 <i class="material-icons">chevron_left</i>
             </a></li>
-        <% for(var page = 0; page <= pages; page++) { %>
+        <% for(var page = 1; page <= pages; page++) { %>
             <% var cls = page == currentPage ? "active" : "waves-effect" %>
             <li class="<%= cls %>"
                 onclick="apretaste.send({command: 'SUGERENCIAS', data: {page: '<%= page %>'}})">
@@ -72,7 +72,7 @@
             </li>
         <% } %>
         <li class="<%= afterPageCls %>"><a
-                    onclick="<%= afterActive ? "apretaste.send({command: 'SUGERENCIAS', data: {page: '" + (currentPage + 1) + "'}})" : "" %>">>
+                    onclick="<%= afterActive ? "apretaste.send({command: 'SUGERENCIAS', data: {page: '" + (currentPage + 1) + "'}})" : "" %>">
                 <i class="material-icons">chevron_right</i>
             </a></li>
     </ul>
