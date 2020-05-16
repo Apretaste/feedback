@@ -377,7 +377,7 @@ class Service
 	 */
 	private function getAvailableVotes($personId)
 	{
-		$res = Database::query("SELECT COUNT(*) AS nbr FROM _sugerencias_votes WHERE person_id = '$personId'");
+		$res = Database::query("SELECT COUNT(*) AS nbr FROM _sugerencias_votes A RIGHT JOIN _sugerencias_list B ON A.feedback=B.id AND B.status = 'NEW' WHERE A.person_id = '$personId'");
 		return $this->MAX_VOTES_X_USER - $res[0]->nbr;
 	}
 }
