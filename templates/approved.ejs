@@ -1,60 +1,44 @@
-<div class = "row">
-	<div class = "col s12 l12 m12 x12">
-		<h1><%= subject %></h1>
-	</div>
+<div class="row">
+    <div class="col s12 l12 m12 x12">
+        <h1><%= subject %></h1>
+    </div>
 </div>
 
-<div class = "row">
-    <div class = "col s12">
-        <ul class = "tabs tabs-fixed-width">
-            <li class = "tab"><a href = "#" onclick = "apretaste.send({command: 'SUGERENCIAS'})">Abiertas</a></li>
-            <li class = "tab"><a href = "#" class="active" onclick = "apretaste.send({command: 'SUGERENCIAS APROBADAS'})">Aprobadas</a></li>
-            <li class = "tab"><a href = "#" onclick = "apretaste.send({command: 'SUGERENCIAS REGLAS'})">Reglas</a></li>
+<div class="row">
+    <div class="col s12">
+        <ul class="tabs tabs-fixed-width">
+            <li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS'})">Abiertas</a></li>
+            <li class="tab"><a href="#" class="active">Aprobadas</a>
+            </li>
+            <li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS REGLAS'})">Reglas</a></li>
         </ul>
     </div>
 </div>
 
-<div class = "row">
-	<div class = "col s12 l12 m12 x12">
-		<table class = "table striped">
-			<% for(var i = 0; i < tickets.length; i++) { var ticket = tickets[i]; %>
-			<tr>
-				<td>
-					<!--details-->
-					<small>Creada por
-						<a href = "#!" onclick = "apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a></small>
-					<br/>
+<div class="row">
+    <div class="col s12 l12 m12 x12">
+        <table class="table striped">
+            <% for(var i = 0; i < tickets.length; i++) { var ticket = tickets[i]; %>
+            <tr>
+                <td>
+                    <!--details-->
+                    <small>Creada por
+                        <a href="#!"
+                           onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a></small>
+                    <br/>
 
-					<!--content-->
-					<%= ticket.text.substring(0, 100) %>...
+                    <!--content-->
+                    <%= ticket.text.substring(0, 100) %>...
 
-					<!--buttons-->
-					<a class = "btn" href = "#!" onclick = "apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">&#x1f50d;
-																																		   Leer</a>
-				</td>
-			</tr>
-			<% } %>
-		</table>
-	</div>
-</div>
-
-<div id = "writeModal" class = "container" status = "closed" style = "display: none;">
-    <div class = "row">
-        <i class = "material-icons small" onclick = "toggleWriteModal()">close</i>
-        <div class = "col s12">
-            <textarea id = "note" class = "materialize-textarea" maxlength = "300" placeholder = "Sugerencia"></textarea>
-        </div>
-        <div class = "actions">
-            <i class = "material-icons small pizarra-color-text right" onclick = "sendNote()">send</i>
-        </div>
+                    <!--buttons-->
+                    <a class="btn" href="#!"
+                       onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">&#x1f50d;
+                        Leer</a>
+                </td>
+            </tr>
+            <% } %>
+        </table>
     </div>
 </div>
-
-<div class = "fixed-action-btn hide-on-share">
-    <a class = "btn-floating btn-large waves-effect waves-light" href = "#!" onclick = "toggleWriteModal();" id = "createButton">
-        <i class = "material-icons">comment</i>
-    </a>
-</div>
-
 
 

@@ -1,9 +1,9 @@
 .person-avatar {
-    float:left;
+    float: left;
     margin-right: 1rem;
 }
 
-.card-action i{
+.card-action i {
     font-size: 1rem;
 }
 
@@ -42,7 +42,7 @@
     bottom: 0;
 }
 
-.upper-text{
+.upper-text {
     text-transform: uppercase;
 }
 
@@ -50,8 +50,15 @@
     margin-bottom: 60px;
 }
 
-ul.rules > li  {
+ul.rules > li {
     list-style: circle;
     margin-left: 2rem;
     margin-bottom: 1rem;
+}
+
+.vote-btn {
+    text-align: center;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
 }

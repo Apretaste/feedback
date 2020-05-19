@@ -36,16 +36,21 @@ class Service
 	{
 		$this->discardSuggestions();
 
+		$page = $request->input->data->page ?? 1;
+		$page--;
+		$offset = $page * 10;
+
 		// get list of tickets
-		$tickets = Database::query("SELECT A.*, B.username, coalesce(case when B.avatar = '' then null else B.avatar end,'apretin') as avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'NEW' ORDER BY votes_count DESC LIMIT 0, 20");
+		$tickets = Database::query("SELECT A.*, B.username, coalesce(case when B.avatar = '' then null else B.avatar end,'apretin') as avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'NEW' ORDER BY votes_count DESC LIMIT $offset, 10");
+		$pages = Database::query("SELECT COUNT(*) as total FROM _sugerencias_list WHERE status = 'NEW'")[0]->total / 10;
 
 		// if not suggestion is registered
 		if (empty($tickets)) {
 			$response->setTemplate('message.ejs', [
-			  'header' => 'No hay sugerencias registradas',
-			  'icon' => 'sentiment_dissatisfied',
-			  'message' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
-			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'header' => 'No hay sugerencias registradas',
+				'icon' => 'sentiment_dissatisfied',
+				'text' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
+				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
 		}
@@ -54,12 +59,16 @@ class Service
 		$availableVotes = $this->getAvailableVotes($request->person->id);
 		$voteButtonEnabled = $availableVotes > 0;
 
+		if ($pages > $page + 5) $pages = $page + 5;
+
 		// create response array
 		$responseContent = [
-		  'subject' => '',
-		  'tickets' => $tickets,
-		  'votosDisp' => $availableVotes,
-		  'voteButtonEnabled' => $voteButtonEnabled
+			'subject' => '',
+			'tickets' => $tickets,
+			'votosDisp' => $availableVotes,
+			'voteButtonEnabled' => $voteButtonEnabled,
+			'pages' => $pages,
+			'currentPage' => $page + 1
 		];
 
 		// return response object
@@ -68,7 +77,7 @@ class Service
 	}
 
 	/**
-	  * Sub-service ver, Display a full ticket
+	 * Sub-service ver, Display a full ticket
 	 *
 	 * @param Request $request
 	 * @param Response $response
@@ -83,10 +92,10 @@ class Service
 		// do not post short suggestions
 		if (strlen($request->input->data->query) <= 10) {
 			$response->setTemplate('message.ejs', [
-			  'header' => 'Sugerencia no válida.',
-			  'icon' => 'sentiment_dissatisfied',
-			  'message' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
-			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'header' => 'Sugerencia no válida.',
+				'icon' => 'sentiment_dissatisfied',
+				'text' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
+				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
 		}
@@ -104,10 +113,10 @@ class Service
 
 		// create response
 		$response->setTemplate('message.ejs', [
-		  'header' => 'Sugerencia recibida',
-		  'icon' => 'sentiment_very_satisfied',
-		  'text' => "Su sugerencia ha sido registrada satisfactoriamente. Ya está visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos o más en un plazo de 15 días, será aprobada y todos ganarán créditos.",
-		  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+			'header' => 'Sugerencia recibida',
+			'icon' => 'sentiment_very_satisfied',
+			'text' => "Su sugerencia ha sido registrada satisfactoriamente. Ya está visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos o más en un plazo de 15 días, será aprobada y todos ganarán créditos.",
+			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 		]);
 	}
 
@@ -143,13 +152,13 @@ class Service
 
 		// translate the status varible
 		if ($suggestion->status === 'NEW') {
-			$suggestion->estado = 'PENDIENTE';
+			$suggestion->estado = 'Pendiente';
 		}
 		if ($suggestion->status === 'APPROVED') {
-			$suggestion->estado = 'APROBADA';
+			$suggestion->estado = 'Aprobada';
 		}
 		if ($suggestion->status === 'DISCARDED') {
-			$suggestion->estado = 'RECHAZADA';
+			$suggestion->estado = 'Rechazada';
 		}
 
 		$response->setTemplate('suggestion.ejs', [
@@ -184,10 +193,10 @@ class Service
 		$votosDisp = $this->getAvailableVotes($request->person->id);
 		if ($votosDisp <= 0) {
 			$response->setTemplate('message.ejs', [
-			  'header' => 'No puedes votar por ahora.',
-			  'icon' => 'sentiment_dissatisfied',
-			  'text' => 'No tienes ningún voto disponible. Debes esperar a que sean aprobadas o descartadas las sugerencias por las que votaste para poder votar por algúna otra. Mientras tanto, puedes ver la lista de sugerencias disponibles o escribir una nueva sugerencia.',
-			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'header' => 'No puedes votar por ahora.',
+				'icon' => 'sentiment_dissatisfied',
+				'text' => 'No tienes ningún voto disponible. Debes esperar a que sean aprobadas o descartadas las sugerencias por las que votaste para poder votar por algúna otra. Mientras tanto, puedes ver la lista de sugerencias disponibles o escribir una nueva sugerencia.',
+				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
 		}
@@ -231,7 +240,7 @@ class Service
 				);
 
 				$msg = "Usted voto por una sugerencia que ha sido aprobada y por lo tanto gano §{$this->CREDITS_X_VOTE}";
-				Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$voter->feedback.'"}}');
+				Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "' . $voter->feedback . '"}}');
 			}
 */
 			// mark suggestion as approved
@@ -256,7 +265,7 @@ class Service
 			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 		]);
 
-		Notifications::alert($suggestion->person_id, "El usuario @{$request->person->username} ha votado por tu sugerencia", '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->id.'"}}');
+		Notifications::alert($suggestion->person_id, "El usuario @{$request->person->username} ha votado por tu sugerencia", '', '{command: "SUGERENCIAS VER",data:{query: "' . $request->input->data->id . '"}}');
 	}
 
 	/**
@@ -291,10 +300,10 @@ class Service
 		// if not suggestion is registered
 		if (empty($tickets)) {
 			$response->setTemplate('message.ejs', [
-			  'header' => 'No hay sugerencias registradas',
-			  'icon' => 'sentiment_dissatisfied',
-			  'text' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
-			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'header' => 'No hay sugerencias registradas',
+				'icon' => 'sentiment_dissatisfied',
+				'text' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
+				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
 		}
@@ -334,10 +343,10 @@ class Service
 		// if not suggestion is registered
 		if (empty($tickets)) {
 			$response->setTemplate('message.ejs', [
-			  'header' => 'No hay sugerencias aprobadas',
-			  'icon' => 'sentiment_dissatisfied',
-			  'text' => 'Actualmente no hay registrada ninguna sugerencia aprobada.',
-			  'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'header' => 'No hay sugerencias aprobadas',
+				'icon' => 'sentiment_dissatisfied',
+				'text' => 'Actualmente no hay registrada ninguna sugerencia aprobada.',
+				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
 			return;
 		}
@@ -368,7 +377,7 @@ class Service
 	 */
 	private function getAvailableVotes($personId)
 	{
-		$res = Database::query("SELECT COUNT(*) AS nbr FROM _sugerencias_votes WHERE person_id = '$personId'");
+		$res = Database::query("SELECT COUNT(*) AS nbr FROM _sugerencias_votes A RIGHT JOIN _sugerencias_list B ON A.feedback=B.id AND B.status = 'NEW' WHERE A.person_id = '$personId'");
 		return $this->MAX_VOTES_X_USER - $res[0]->nbr;
 	}
 }

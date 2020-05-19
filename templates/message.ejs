@@ -1,28 +1,30 @@
-<div class = "row">
-	<div class = "col s12 center">
-		<h1 class = "black-text"><%- header %></h1>
-		<i class = "material-icons large"><%= icon %></i>
-		<p><%- text %></p>
-		<a class = "waves-effect waves-light btn piropazo-color" href = "#!" onclick = "apretaste.send({'command':'<%= button['href'] %>'})">
-			<%= button['caption'] %>
-		</a>
-	</div>
+<div class="row">
+    <div class="col s12 center">
+        <h1 class="black-text"><%- header %></h1>
+        <i class="material-icons large"><%= icon %></i>
+        <p><%- text %></p>
+        <a class="waves-effect waves-light btn piropazo-color" href="#!"
+           onclick="apretaste.send({'command':'<%= button['href'] %>'})">
+            <%= button['caption'] %>
+        </a>
+    </div>
 </div>
 
-<div id = "writeModal" class = "container" status = "closed" style = "display: none;">
-    <div class = "row">
-        <i class = "material-icons small" onclick = "toggleWriteModal()">close</i>
-        <div class = "col s12">
-            <textarea id = "note" class = "materialize-textarea" maxlength = "300" placeholder = "Sugerencia"></textarea>
+<div id="writeModal" class="container" status="closed" style="display: none;">
+    <div class="row">
+        <i class="material-icons small" onclick="toggleWriteModal()">close</i>
+        <div class="col s12">
+            <textarea id="note" class="materialize-textarea" maxlength="300" placeholder="Sugerencia"></textarea>
         </div>
-        <div class = "actions">
-            <i class = "material-icons small pizarra-color-text right" onclick = "sendNote()">send</i>
+        <div class="actions">
+            <i class="material-icons small pizarra-color-text right" onclick="sendNote()">send</i>
         </div>
     </div>
 </div>
 
-<div class = "fixed-action-btn hide-on-share">
-    <a class = "btn-floating btn-large waves-effect waves-light" href = "#!" onclick = "toggleWriteModal();" id = "createButton">
-        <i class = "material-icons">comment</i>
+<div class="fixed-action-btn hide-on-share">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="toggleWriteModal();"
+       id="createButton">
+        <i class="material-icons">comment</i>
     </a>
 </div>

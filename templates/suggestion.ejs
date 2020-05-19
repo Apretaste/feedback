@@ -1,37 +1,35 @@
-<div class = "row">
-    <div class = "col s12">
-        <ul class = "tabs tabs-fixed-width">
-            <li class = "tab"><a href = "#" onclick = "apretaste.send({command: 'SUGERENCIAS'})">Abiertas</a></li>
-            <li class = "tab"><a href = "#" onclick = "apretaste.send({command: 'SUGERENCIAS APROBADAS'})">Aprobadas</a></li>
-            <li class = "tab"><a href = "#" onclick = "apretaste.send({command: 'SUGERENCIAS REGLAS'})">Reglas</a></li>
-        </ul>
-    </div>
-</div>
-<div class = "row">
-	<div class = "col s12 l12 m12 x12">
-		<div class = "person-avatar circle" face = "<%= suggestion.avatar %>" color = "<%= suggestion.avatarColor %>" size = "42" onclick = "apretaste.send({'command': 'PIZARRA PERFIL', 'data': {'username':'@<%= suggestion.username %>'}});"></div>
-		Sugerida por @<%= suggestion.username %><br/>
-		<% if (suggestion.status == "NEW") { %>
-			Expira el <%= formatDateTime(suggestion.limit_date) %><br/>
-			Faltan <%= suggestion.limit_votes - suggestion.votes_count %> votos para aprobarla<br/>
-		<% } %>
-		Estado: <%= suggestion.estado %>
+<div class="row">
+    <ul class="collection" style="border: none;">
+        <li class="collection-item avatar">
+            <div class="person-avatar circle" face="<%= suggestion.avatar %>" color="<%= suggestion.avatarColor %>"
+                 size="42"
+                 onclick="apretaste.send({'command': 'PIZARRA PERFIL', 'data': {'username':'@<%= suggestion.username %>'}});"></div>
+            Sugerida por @<%= suggestion.username %><br/>
+            <% if (suggestion.status == "NEW") { %>
+                Expira el <%= formatDateTime(suggestion.limit_date) %><br/>
+                Faltan <%= suggestion.limit_votes - suggestion.votes_count %> votos para aprobarla<br/>
+            <% } %>
+            Estado: <b><%= suggestion.estado %></b>
 
-		<p style = "background-color:#F2F2F2; padding:10px;"><big><%= suggestion.text %></big></p>
-		<% if (voteButtonEnabled) { %>
-			<a href = "#!" onclick = "apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= suggestion.id %>'}});">
-				Votar(<%= votosDisp %>)
-			</a>
-		<% } else { %>
-			<span class = "upper-text gray">Votar (0)</span>
-		<% } %>
-	</div>
+            <p style="background-color:#F2F2F2; padding:10px;"><big><%= suggestion.text %></big></p>
+            <% if (voteButtonEnabled) { %>
+                <a href="#!"
+                   onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= suggestion.id %>'}});">
+                    Votar(<%= votosDisp %>)
+                </a>
+            <% } else { %>
+                <button class="btn btn-small vote-btn" style="margin-top: 1rem">Votar (0)</button>
+            <% } %>
+        </li>
+
+    </ul>
 </div>
 
-<div class = "bottom-space"></div>
+<div class="bottom-space"></div>
 
-<div class = "fixed-action-btn hide-on-share">
-	<a class = "btn-floating btn-large waves-effect waves-light" href = "#!" onclick = "apretaste.send({command: 'SUGERENCIAS', data: {}});">
-		<i class = "material-icons">arrow_back</i>
-	</a>
+<div class="fixed-action-btn hide-on-share">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!"
+       onclick="apretaste.send({command: 'SUGERENCIAS', data: {}});">
+        <i class="material-icons">arrow_back</i>
+    </a>
 </div>
