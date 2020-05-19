@@ -213,13 +213,13 @@ class Service
 		// check if the idea reached the number of votes to be approved
 		if ($suggestion->votes_count + 1 >= $suggestion->limit_votes) {
 			// asign credits to the creator and send a notification
-			Money::send(Money::BANK, $suggestion->person_id, $this->CREDITS_X_APPROVED, 'sugerencia aprobada');
+			/*Money::send(Money::BANK, $suggestion->person_id, $this->CREDITS_X_APPROVED, 'sugerencia aprobada');
 
 			$msg = "Una sugerencia suya ha sido aprobada y usted gano §{$this->CREDITS_X_APPROVED}. Gracias!";
 			Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->id.'"}}');
-
+*/
 			// get all the people who voted for the suggestion
-			$voters = Database::query("SELECT `person_id`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->input->data->id}");
+			/*$voters = Database::query("SELECT `person_id`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->input->data->id}");
 
 			// asign credits to the voters and send a notification
 			foreach ($voters as $voter) {
@@ -233,7 +233,7 @@ class Service
 				$msg = "Usted voto por una sugerencia que ha sido aprobada y por lo tanto gano §{$this->CREDITS_X_VOTE}";
 				Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$voter->feedback.'"}}');
 			}
-
+*/
 			// mark suggestion as approved
 			Database::query("UPDATE _sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->input->data->id}");
 		}
