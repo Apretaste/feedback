@@ -1,64 +1,8 @@
-.person-avatar {
-    float: left;
-    margin-right: 1rem;
+.suggestion-avatar {
+	margin: auto;
+	margin-top: 10px;
 }
 
-.card-action i {
-    font-size: 1rem;
-}
-
-
-#writeModal {
-    position: fixed;
-    bottom: 0;
-    z-index: 999;
-    height: 100%;
-    background: white;
-}
-
-#writeModal textarea {
-    width: calc(100% - 28px);
-    border: none;
-}
-
-#writeModal > .row {
-    height: 100%;
-}
-
-#writeModal > .row > .col {
-    height: calc(100% - 40px);
-}
-
-#writeModal > .row > i:first-child {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-#writeModal .actions {
-    position: absolute;
-    width: 100%;
-    padding: 10px;
-    bottom: 0;
-}
-
-.upper-text {
-    text-transform: uppercase;
-}
-
-.bottom-space {
-    margin-bottom: 60px;
-}
-
-ul.rules > li {
-    list-style: circle;
-    margin-left: 2rem;
-    margin-bottom: 1rem;
-}
-
-.vote-btn {
-    text-align: center;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+.message {
+	margin-top: 0px;
 }
