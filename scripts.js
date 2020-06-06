@@ -1,49 +1,34 @@
 $(function(){
-    moment.locale("es");
-    $('.tabs').tabs();
+	$('.tabs').tabs();
+	$('.modal').modal();
+	$('select').formSelect();
 });
 
-function formatDate(dateStr) {
-    moment.locale("es");
-    return moment(dateStr).format('DD/MM/YYYY');
+function sendMessage() {
+	var message = $('#message').val().trim();
+
+	if (message.length < 20 || message.length > 300) {
+		M.toast({html: "Escriba entre 20 y 300 caracteres"});
+		return false;
+	}
+
+	apretaste.send({
+		'command': 'SUGERENCIAS CREAR',
+		'data': {'message': message}
+	});
 }
 
-function formatDateTime(dateStr) {
-    moment.locale("es");
-    return moment(dateStr).format('D [de] MMMM [del] YYYY [a las] h:mm A');
-}
+function startSearch() {
+	var username = $('#username').val().trim();
+	var status = $('#status').val();
+	var text = $('#text').val();
 
-function toggleWriteModal() {
-    var status = $('#writeModal').attr('status');
-
-    if (status == "closed") {
-        if ($('.container:not(#writeModal) > .row').length == 3) {
-            var h = $('.container:not(#writeModal) > .row')[0].clientHeight;
-            $('#writeModal').css('height', 'calc(100% - ' + h + 'px)');
-        }
-
-        $('#writeModal').slideToggle({
-            direction: "up"
-        }).attr('status', 'opened');
-        $('#note').focus();
-    } else {
-        $('#writeModal').slideToggle({
-            direction: "up"
-        }).attr('status', 'closed');
-    }
-}
-
-function sendNote() {
-    var note = $('#note').val().trim();
-
-    if (note.length >= 20) {
-        apretaste.send({
-            'command': 'SUGERENCIAS CREAR',
-            'data': {
-                'query': note
-            }
-        });
-    } else {
-        M.toast({html: "Escriba un poco mas"});
-    }
+	apretaste.send({
+		'command': 'SUGERENCIAS ENCONTRAR',
+		'data': {
+			'username': username, 
+			'status': status,
+			'text': text
+		}
+	});
 }

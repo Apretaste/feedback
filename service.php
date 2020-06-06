@@ -8,264 +8,176 @@ use Framework\Database;
 
 class Service
 {
-	private int $CREDITS_X_APPROVED = 5;
-	private float $CREDITS_X_VOTE = 0.5;
-	private int $MAX_VOTES_X_USER = 5;
-
-	/**
-	 * Discard suggestions
-	 *
-	 * @throws \Framework\Alert
-	 */
-	private function discardSuggestions(): void
-	{
-		// discard suggestions that run out of time
-		Database::query("UPDATE _sugerencias_list SET status='DISCARDED', updated=CURRENT_TIMESTAMP WHERE limit_date <= CURRENT_TIMESTAMP AND status = 'NEW'");
-	}
-
 	/**
 	 * Function executed when the service is called
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @return void
-	 * @throws \Framework\Alert
+	 * @throws Alert
 	 */
 	public function _main(Request $request, Response $response)
 	{
-		$this->discardSuggestions();
-
-		$page = $request->input->data->page ?? 1;
-		$page--;
-		$offset = $page * 10;
+		// filter by page number
+		$page = $request->input->data->page ?? 0;
+		if($page < 0) $page = 0;
+		$offset = $page * 20;
 
 		// get list of tickets
-		$tickets = Database::query("SELECT A.*, B.username, coalesce(case when B.avatar = '' then null else B.avatar end,'apretin') as avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'NEW' ORDER BY votes_count DESC LIMIT $offset, 10");
-		$pages = Database::query("SELECT COUNT(*) as total FROM _sugerencias_list WHERE status = 'NEW'")[0]->total / 10;
+		$tickets = Database::query("
+			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor 
+			FROM _sugerencias_list A 
+			INNER JOIN person B ON A.person_id = B.id 
+			WHERE A.limit_date > CURRENT_TIMESTAMP
+			AND A.votes_count < A.limit_votes
+			ORDER BY A.votes_count DESC
+			LIMIT 20 OFFSET $offset");
 
 		// if not suggestion is registered
 		if (empty($tickets)) {
-			$response->setTemplate('message.ejs', [
-				'header' => 'No hay sugerencias registradas',
+			return $response->setTemplate('message.ejs', [
+				'header' => 'No hay sugerencias',
 				'icon' => 'sentiment_dissatisfied',
-				'text' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
-				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'text' => 'No encontramos ninguna sugerencia abierta. Puede añadir una sugerencia, o buscar alguna para votar.',
+				'button' => ['href' => 'SUGERENCIAS BUSCAR', 'caption' => 'Buscar']
 			]);
-			return;
 		}
 
-		// check if vote button should be enabled
-		$availableVotes = $this->getAvailableVotes($request->person->id);
-		$voteButtonEnabled = $availableVotes > 0;
+		// calculate percentages
+		foreach ($tickets as $ticket) {
+			$ticket->percent = floor(($ticket->votes_count * 100) / $ticket->limit_votes);
+			$dots = mb_strlen($ticket->text) > 80 ? '...' : '';
+			$ticket->text = trim(mb_substr($ticket->text, 0, 80)) . $dots;
+		}
 
-		if ($pages > $page + 5) $pages = $page + 5;
+		// calculate the total number of pages
+		$rowsCount = Database::queryCache("SELECT COUNT(id) AS cnt FROM _sugerencias_list A WHERE A.limit_date > CURRENT_TIMESTAMP")[0]->cnt;
+		$pagesCount = ceil($rowsCount / 20);
+
+		// check if vote button can be enabled
+		$canVote = Database::queryFirst("
+			SELECT COUNT(id) AS cnt 
+			FROM _sugerencias_votes 
+			WHERE person_id = {$request->person->id} 
+			AND vote_date >= CURRENT_DATE")->cnt == 0;
 
 		// create response array
-		$responseContent = [
-			'subject' => '',
+		$content = [
 			'tickets' => $tickets,
-			'votosDisp' => $availableVotes,
-			'voteButtonEnabled' => $voteButtonEnabled,
-			'pages' => $pages,
-			'currentPage' => $page + 1
-		];
+			'canVote' => $canVote,
+			'page' => $page,
+			'pages' => $pagesCount];
 
 		// return response object
-		//$response->setCache('hour');
-		$response->setTemplate('list.ejs', $responseContent);
-	}
-
-	/**
-	 * Sub-service ver, Display a full ticket
-	 *
-	 * @param Request $request
-	 * @param Response $response
-	 * @throws \Framework\Alert
-	 */
-	public function _crear(Request $request, Response $response)
-	{
-		if (!isset($request->input->data->query)) {
-			return;
-		}
-
-		// do not post short suggestions
-		if (strlen($request->input->data->query) <= 10) {
-			$response->setTemplate('message.ejs', [
-				'header' => 'Sugerencia no válida.',
-				'icon' => 'sentiment_dissatisfied',
-				'text' => 'Esta sugerencia no se entiende. Por favor escribe una idea válida, puedes añadir una usando el boton de abajo.',
-				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
-			]);
-			return;
-		}
-
-		// get the deadline to discard the suggestion
-		$fecha = new DateTime();
-		$deadline = $fecha->modify('+15 days')->format('Y-m-d H:i:s');
-
-		// get the number of votes to approved the suggestion
-		$result = Database::query('SELECT COUNT(email) AS nbr FROM person WHERE active=1');
-		$limitVotes = ceil($result[0]->nbr * 0.01);
-
-		// insert a new suggestion
-		Database::query("INSERT INTO _sugerencias_list (`person_id`, `text`, `limit_votes`, `limit_date`) VALUES ('{$request->person->id}', '{$request->input->data->query}', '$limitVotes', '$deadline')");
-
-		// create response
-		$response->setTemplate('message.ejs', [
-			'header' => 'Sugerencia recibida',
-			'icon' => 'sentiment_very_satisfied',
-			'text' => "Su sugerencia ha sido registrada satisfactoriamente. Ya está visible en la lista de sugerencias para que todos puedan votar por ella. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos o más en un plazo de 15 días, será aprobada y todos ganarán créditos.",
-			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
-		]);
+		$response->setCache('hour');
+		$response->setTemplate('list.ejs', $content);
 	}
 
 	/**
 	 * Display a full ticket
 	 *
 	 * @param Request $request
-	 *
-	 * @return Response|void
-	 * @throws \Framework\Alert
+	 * @return Response
 	 */
 	public function _ver(Request $request, Response $response)
 	{
-		if (!isset($request->input->data->id)) {
-			return;
-		}
+		// get the id, or nullify the query
+		$id = $request->input->data->id ?? 0;
 
 		// get the suggestion
-		$suggestion = Database::query("
-			SELECT _sugerencias_list.*, person.username, person.avatar, person.avatarColor 
-			FROM _sugerencias_list inner join person on person.id =  _sugerencias_list.person_id
-			WHERE _sugerencias_list.id = '{$request->input->data->id}'");
+		$suggestion = Database::queryFirst("
+			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor 
+			FROM _sugerencias_list A 
+			INNER JOIN person B 
+			ON A.person_id = B.id
+			WHERE A.id = $id");
 
+		// do not continue if not ID was passed
 		if (empty($suggestion)) {
-			return;
+			return $response->setTemplate('message.ejs', [
+				'header' => 'Sugerencia no válida.',
+				'icon' => 'sentiment_dissatisfied',
+				'text' => 'No pudimos encontrar esta sugerencia. Es posible que esto sea un error, por favor intente nuevamente.',
+				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+			]);
 		}
 
-		$suggestion = $suggestion[0];
+		// calculate percentage
+		$suggestion->percent = floor(($suggestion->votes_count * 100) / $suggestion->limit_votes);
 
-		// check if vote button should be enabled
-		$availableVotes = $this->getAvailableVotes($request->person->id);
-		$voteButtonEnabled = $availableVotes > 0 && $suggestion->status === 'NEW';
+		// check if vote button can be enabled
+		$canVote = Database::queryFirst("
+			SELECT COUNT(id) AS cnt 
+			FROM _sugerencias_votes 
+			WHERE person_id = {$request->person->id} 
+			AND vote_date >= CURRENT_DATE")->cnt == 0;
 
-		// translate the status varible
-		if ($suggestion->status === 'NEW') {
-			$suggestion->estado = 'Pendiente';
-		}
-		if ($suggestion->status === 'APPROVED') {
-			$suggestion->estado = 'Aprobada';
-		}
-		if ($suggestion->status === 'DISCARDED') {
-			$suggestion->estado = 'Rechazada';
-		}
-
-		$response->setTemplate('suggestion.ejs', [
-			'suggestion' => $suggestion,
-			'voteButtonEnabled' => $voteButtonEnabled,
-			'votosDisp' => $availableVotes
-		]);
+		// return response object
+		$response->setCache('hour');
+		$response->setTemplate('view.ejs', ['suggestion'=>$suggestion, 'canVote'=>$canVote]);
 	}
 
 	/**
-	 * Sub-service votar
+	 * Search for a group of suggestions
 	 *
 	 * @param Request $request
-	 *
-	 * @throws \Framework\Alert
+	 * @param Response $response
 	 */
-	public function _votar(Request $request, Response $response)
+	public function _buscar(Request $request, Response $response)
 	{
-		if (!isset($request->input->data->id)) {
-			return;
-		}
+		$response->setCache('year');
+		$response->setTemplate('search.ejs', []);
+	}
 
-		// do not let pass without ID, and get the suggestion for later
-		$suggestion = Database::query("SELECT `person_id`, votes_count, limit_votes FROM _sugerencias_list WHERE id={$request->input->data->id} AND status='NEW'");
-		if (empty($suggestion)) {
-			return;
-		}
+	/**
+	 * Process a search
+	 *
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function _encontrar(Request $request, Response $response)
+	{
+		// get search values
+		$username = empty($request->input->data->username) ? '' : str_replace('@', '', $request->input->data->username);
+		$status = empty($request->input->data->status) ? '' : $request->input->data->status;
+		$text = empty($request->input->data->text) ? '' : $request->input->data->text;
 
-		$suggestion = $suggestion[0];
+		// get the right query based on status
+		$statusQuery = '';
+		if($status == 'OPEN') $statusQuery = "AND A.limit_date > CURRENT_TIMESTAMP AND A.votes_count < A.limit_votes";
+		elseif($status == 'DISCARDED') $statusQuery = "AND A.limit_date < CURRENT_TIMESTAMP AND A.votes_count < A.limit_votes";
+		elseif($status == 'APPROVED') $statusQuery = "AND A.limit_date <= CURRENT_TIMESTAMP AND A.votes_count >= A.limit_votes";
 
-		// check you have enough available votes
-		$votosDisp = $this->getAvailableVotes($request->person->id);
-		if ($votosDisp <= 0) {
-			$response->setTemplate('message.ejs', [
-				'header' => 'No puedes votar por ahora.',
+		// get list of tickets
+		$tickets = Database::query("
+			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor 
+			FROM _sugerencias_list A 
+			INNER JOIN person B ON A.person_id = B.id 
+			WHERE B.username LIKE '%$username%'
+			AND A.text LIKE '%$text%'
+			$statusQuery
+			ORDER BY A.votes_count DESC
+			LIMIT 20");
+
+		// if not suggestion is registered
+		if (empty($tickets)) {
+			return $response->setTemplate('message.ejs', [
+				'header' => 'No hay sugerencias',
 				'icon' => 'sentiment_dissatisfied',
-				'text' => 'No tienes ningún voto disponible. Debes esperar a que sean aprobadas o descartadas las sugerencias por las que votaste para poder votar por algúna otra. Mientras tanto, puedes ver la lista de sugerencias disponibles o escribir una nueva sugerencia.',
-				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'text' => 'No encontramos ninguna sugerencia que responda a dicha búsqueda. Por favor cambie sus parámetros de búsqueda e intente nuevamente.',
+				'button' => ['href' => 'SUGERENCIAS BUSCAR', 'caption' => 'Buscar sugerencias']
 			]);
-			return;
 		}
 
-		// check if the user already voted for that idea
-		$res = Database::query("SELECT COUNT(id) as nbr FROM _sugerencias_votes WHERE person_id='{$request->person->id}' AND feedback='{$request->input->data->id}'");
-		if ($res[0]->nbr > 0) {
-			$mensaje = 'No puedes votar dos veces por la misma sugerencia. Puedes seleccionar otra de la lista de sugerencias disponibles o escribir una nueva sugerencia.';
-			$response->setTemplate('message.ejs', [
-				'header' => 'Votación fallida',
-				'icon' => 'sentiment_dissatisfied',
-				'text' => "Ya habías votado por esa sugerencia. $mensaje",
-				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
-			]);
-			return;
+		// calculate percentages
+		foreach ($tickets as $ticket) {
+			$ticket->percent = floor(($ticket->votes_count * 100) / $ticket->limit_votes);
+			$dots = mb_strlen($ticket->text) > 80 ? '...' : '';
+			$ticket->text = trim(mb_substr($ticket->text, 0, 80)) . $dots;
 		}
 
-		// aqui inserto el voto y aumento el contador
-		Database::query("
-			INSERT INTO _sugerencias_votes (`person_id`, feedback) VALUES ('{$request->person->id}', '{$request->input->data->id}');
-			UPDATE _sugerencias_list SET votes_count=votes_count+1 WHERE id={$request->input->data->id};");
-
-		// check if the idea reached the number of votes to be approved
-		if ($suggestion->votes_count + 1 >= $suggestion->limit_votes) {
-			// asign credits to the creator and send a notification
-			/*Money::send(Money::BANK, $suggestion->person_id, $this->CREDITS_X_APPROVED, 'sugerencia aprobada');
-
-			$msg = "Una sugerencia suya ha sido aprobada y usted gano §{$this->CREDITS_X_APPROVED}. Gracias!";
-			Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "'.$request->input->data->id.'"}}');
-*/
-			// get all the people who voted for the suggestion
-			/*$voters = Database::query("SELECT `person_id`, feedback FROM `_sugerencias_votes` WHERE `feedback` = {$request->input->data->id}");
-
-			// asign credits to the voters and send a notification
-			foreach ($voters as $voter) {
-				Money::send(
-					Money::BANK,
-					$voter->person_id,
-					$this->CREDITS_X_VOTE,
-					'VOTO A SUGERENCIA APROBADA'
-				);
-
-				$msg = "Usted voto por una sugerencia que ha sido aprobada y por lo tanto gano §{$this->CREDITS_X_VOTE}";
-				Notifications::alert($request->person->id, $msg, '', '{command: "SUGERENCIAS VER",data:{query: "' . $voter->feedback . '"}}');
-			}
-*/
-			// mark suggestion as approved
-			Database::query("UPDATE _sugerencias_list SET status='APPROVED', updated=CURRENT_TIMESTAMP WHERE id={$request->input->data->id}");
-		}
-
-		// create message to send to the user
-		$votosDisp--;
-		if ($votosDisp > 0) {
-			$aux = "Le quedan $votosDisp votos. Cuando las ideas que apoyó ganan o pierdan, usted recuperará sus votos";
-		} else {
-			$aux = 'Ya no tiene ningún voto disponible. Ahora debe esperar a que sean aprobadas o descartadas las sugerencias por las cuales votó para poder votar por algúna otra.';
-		}
-
-		$mensaje = "Su voto ha sido registrado satisfactoriamente. $aux";
-
-		// send response object
-		$response->setTemplate('message.ejs', [
-			'header' => 'Voto enviado',
-			'icon' => 'sentiment_very_satisfied',
-			'text' => $mensaje,
-			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
-		]);
-
-		Notifications::alert($suggestion->person_id, "El usuario @{$request->person->username} ha votado por tu sugerencia", '', '{command: "SUGERENCIAS VER",data:{query: "' . $request->input->data->id . '"}}');
+		// return response object
+		$response->setCache('hour');
+		$response->setTemplate('find.ejs', ['tickets' => $tickets]);
 	}
 
 	/**
@@ -273,8 +185,6 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @throws \Framework\Alert
 	 */
 	public function _reglas(Request $request, Response $response)
 	{
@@ -283,101 +193,85 @@ class Service
 	}
 
 	/**
-	 * Return all suggestions
+	 * Sub-service ver, Display a full ticket
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @throws \Framework\Alert
 	 */
-	public function _todas(Request $request, Response $response): void
+	public function _crear(Request $request, Response $response)
 	{
-		$this->discardSuggestions();
+		// get the message
+		$message = $request->input->data->message ?? "";
 
-		// get list of tickets
-		$tickets = Database::query('SELECT A.*, B.username, B.avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id ORDER BY votes_count DESC');
-
-		// if not suggestion is registered
-		if (empty($tickets)) {
-			$response->setTemplate('message.ejs', [
-				'header' => 'No hay sugerencias registradas',
+		// do not post short suggestions
+		if (strlen($message) < 20) {
+			return $response->setTemplate('message.ejs', [
+				'header' => 'Sugerencia no válida.',
 				'icon' => 'sentiment_dissatisfied',
-				'text' => 'Actualmente no hay registrada ninguna sugerencia. Añada la primera sugerencia usando el botón de abajo.',
+				'text' => 'Esta sugerencia no se entiende. Por favor escribe una idea que tenga más de 20 caracteres y menos de 300',
 				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
-			return;
 		}
 
-		// check if vote button should be enabled
-		$availableVotes = $this->getAvailableVotes($request->person->id);
-		$voteButtonEnabled = $availableVotes > 0;
+		// get the deadline to discard the suggestion
+		$fecha = new DateTime();
+		$deadline = $fecha->modify('+15 days')->format('Y-m-d H:i:s');
 
-		// create response array
-		$responseContent = [
-			'subject' => 'Todas las sugerencias recibidas',
-			'tickets' => $tickets,
-			'votosDisp' => $availableVotes,
-			'voteButtonEnabled' => $voteButtonEnabled
-		];
+		// get the number of votes to approve the suggestion
+		$result = Database::queryCache("SELECT COUNT(id) AS cnt FROM person WHERE active=1", Database::CACHE_DAY);
+		$limitVotes = ceil($result[0]->cnt * 0.01);
 
-		// return response object
-		//$response->setCache('hour');
-		$response->setTemplate('list.ejs', $responseContent);
+		// insert a new suggestion
+		Database::query("
+			INSERT INTO _sugerencias_list (person_id, `text`, limit_votes, limit_date) 
+			VALUES ({$request->person->id}, '$message', '$limitVotes', '$deadline')");
+
+		// create response
+		$response->setTemplate('message.ejs', [
+			'header' => 'Sugerencia recibida',
+			'icon' => 'thumb_up',
+			'text' => "Su sugerencia ha sido registrada satisfactoriamente y ya está visible para que otros voten. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos en 15 días, será aprobada y todos ganarán créditos.",
+			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+		]);
 	}
 
 	/**
-	 * Subservice aprobadas
+	 * Sub-service votar
 	 *
 	 * @param Request $request
-	 * @param Response $response
-	 * @return void
-	 * @throws \Framework\Alert
 	 */
-	public function _aprobadas(Request $request, Response $response)
+	public function _votar(Request $request, Response $response)
 	{
-		$this->discardSuggestions();
+		// get the id, or nullify the query
+		$id = $request->input->data->id ?? 0;
 
-		// get list of tickets
-		$tickets = Database::query("SELECT A.*, B.username, B.avatar, B.avatarColor FROM _sugerencias_list A INNER JOIN person B ON A.person_id = B.id WHERE status = 'APPROVED' ORDER BY updated DESC LIMIT 0, 20");
+		// get the suggestion
+		$suggestion = Database::queryFirst("SELECT * FROM _sugerencias_list WHERE id = $id");
 
-		// if not suggestion is registered
-		if (empty($tickets)) {
-			$response->setTemplate('message.ejs', [
-				'header' => 'No hay sugerencias aprobadas',
+		// do not continue if not ID was passed
+		if (empty($suggestion)) {
+			return $response->setTemplate('message.ejs', [
+				'header' => 'Votación fallida',
 				'icon' => 'sentiment_dissatisfied',
-				'text' => 'Actualmente no hay registrada ninguna sugerencia aprobada.',
+				'text' => "Hemos encontrado un error en la votacion, por favor busque dicha sugerencia e intente nuevamente",
 				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
 			]);
-			return;
 		}
 
-		// check if vote button should be enabled
-		$availableVotes = $this->getAvailableVotes($request->person->id);
-		$voteButtonEnabled = $availableVotes > 0;
+		// create vote and increase suggestion counter
+		Database::query("
+			INSERT INTO _sugerencias_votes (person_id, feedback) VALUES ({$request->person->id}, $id);
+			UPDATE _sugerencias_list SET votes_count = votes_count + 1 WHERE id = $id;");
 
-		// create response array
-		$responseContent = [
-			'subject' => 'Lista de sugerencias aprobadas',
-			'tickets' => $tickets,
-			'votosDisp' => $availableVotes,
-			'voteButtonEnabled' => $voteButtonEnabled
-		];
+		// send notification
+		Notifications::alert($suggestion->person_id, "El usuario @{$request->person->username} ha votado por tu sugerencia", '', '{command:"SUGERENCIAS VER", data:{query:"'.$id.'"}}');
 
-		// return response object
-		//$response->setCache('hour');
-		$response->setTemplate('approved.ejs', $responseContent);
-	}
-
-	/**
-	 * Verify how many votes are avaiable
-	 *
-	 * @param $personId
-	 * @return int
-	 * @throws \Framework\Alert
-	 */
-	private function getAvailableVotes($personId)
-	{
-		$res = Database::query("SELECT COUNT(*) AS nbr FROM _sugerencias_votes A RIGHT JOIN _sugerencias_list B ON A.feedback=B.id AND B.status = 'NEW' WHERE A.person_id = '$personId'");
-		return $this->MAX_VOTES_X_USER - $res[0]->nbr;
+		// send response object
+		$response->setTemplate('message.ejs', [
+			'header' => 'Voto enviado',
+			'icon' => 'thumb_up',
+			'text' => "Su voto ha sido registrado satisfactoriamente. Mañana tendrá otro voto disponible. ¡Gracias por ayudarnos a mejorar Apretaste!",
+			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+		]);
 	}
 }

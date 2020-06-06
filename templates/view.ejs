@@ -1,0 +1,39 @@
+<div class="row">
+	<div class="col s12 center-align">
+		<!-- DETAILS -->
+		<a onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= suggestion.username %>'}})">
+			<div class="person-avatar circle suggestion-avatar" face="<%= suggestion.avatar %>" color="<%= suggestion.avatarColor %>" size="84"></div>
+			@<%= suggestion.username %>
+			<br>
+			<br>
+		</a>
+
+		<div>
+			<p>Fecha límite: <%= moment(suggestion.limit_date).format('D [de] MMMM [del] YYYY') %></p>
+
+			<div class="progress" style="margin-bottom:0px;">
+				<div class="determinate" style="width: <%= suggestion.percent %>%"></div>
+			</div>
+
+			<p class="green-text message"><%= suggestion.votes_count %> votos, <%= suggestion.percent %>%</p>
+		</div>
+
+		<p style="margin-bottom:20px;"><big><%= suggestion.text %></big></p>
+
+		<% if (canVote) { %>
+			<a class="waves-effect waves-light btn-small" href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id:'<%= suggestion.id %>'}})">
+				<i class="material-icons left">thumb_up</i> Votar
+			</a>
+		<% } else { %>
+			<p class="red-text">Mañana tendrá otro voto disponible</p>
+		<% } %>
+	</div>
+</div>
+
+<div class="bottom-space"></div>
+
+<div class="fixed-action-btn hide-on-share">
+	<a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="apretaste.back()">
+		<i class="material-icons">arrow_back</i>
+	</a>
+</div>

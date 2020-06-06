@@ -1,0 +1,42 @@
+<div class="row">
+	<div class="col s12">
+		<!-- LIST OF SUGESTIONS -->
+		<% tickets.forEach(function(ticket) { %>
+		<div class="card">
+			<div class="card-content">
+				<div class="row" style="margin-bottom:0px;">
+					<div class="col s2 m1">
+						<div class="person-avatar circle suggestion-avatar" face="<%= ticket.avatar %>" color="<%= ticket.avatarColor %>" size="42" onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= ticket.username %>'}})"></div>
+					</div>
+					<div class="col s10 m11">
+						<p class="grey-text">
+							<a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a>
+							&middot;
+							Expira el <%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
+						</p>
+
+						<p style="margin:5px 0px 15px 0px;"><%= ticket.text %></p>
+
+						<div class="progress" style="margin-bottom:0px;">
+							<div class="determinate" style="width: <%= ticket.percent %>%"></div>
+						</div>
+
+						<p class="green-text"><%= ticket.votes_count %> votos, <%= ticket.percent %>%</p>
+					</div>
+				</div>
+			</div>
+			<div class="card-action grey lighten-2">
+				<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">Ver más</a>
+			</div>
+		</div>
+		<% }) %>
+	</div>
+</div>
+
+<div class="bottom-space"></div>
+
+<div class="fixed-action-btn hide-on-share">
+	<a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="apretaste.send({command:'SUGERENCIAS BUSCAR'})">
+		<i class="material-icons">arrow_back</i>
+	</a>
+</div>

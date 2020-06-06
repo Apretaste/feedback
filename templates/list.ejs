@@ -1,101 +1,94 @@
 <div class="row">
-    <div class="col s12">
-        <ul class="tabs tabs-fixed-width">
-            <li class="tab"><a href="#" class="active">Abiertas</a>
-            </li>
-            <li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS APROBADAS'})">Aprobadas</a></li>
-            <li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS REGLAS'})">Reglas</a></li>
-        </ul>
-    </div>
+	<div class="col s12">
+		<ul class="tabs tabs-fixed-width">
+			<li class="tab"><a href="#" class="active">Abiertas</a></li>
+			<li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS BUSCAR'})">Buscar</a></li>
+			<li class="tab"><a href="#" onclick="apretaste.send({command: 'SUGERENCIAS REGLAS'})">Reglas</a></li>
+		</ul>
+	</div>
 </div>
-
-<style>
-    .person-avatar {
-        top: 6px;
-        position: relative;
-    }
-</style>
 
 <div class="row">
-    <div class="col s12 l12 m12 x12">
-        <% for(var i = 0; i < tickets.length; i++) { var ticket = tickets[i]; %>
-        <div class="card">
-            <div class="card-content">
-                <div class="row">
-                    <div class="col l1 s2 xk1 m1">
-                        <div class="person-avatar circle" face="<%= ticket.avatar %>" color="<%= ticket.avatarColor %>"
-                             size="42"
-                             onclick="apretaste.send({'command': 'PIZARRA PERFIL', 'data': {'username':'@<%= ticket.username %>'}});"></div>
-                    </div>
-                    <div class="col l11 s10 xk11 m11">
-                        <!--details-->
-                        <p><small>
-                                Creada por
-                                <a href="#!"
-                                   onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a><br/>
-                                Expira el <%= formatDate(ticket.limit_date) %>.<br/>
-                                Faltan <%= ticket.limit_votes - ticket.votes_count %> votos
-                            </small></p>
-                    </div>
-                </div>
-                <%= ticket.text.substring(0, 100) %>...
-            </div>
-            <div class="card-action">
-                <a href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">Leer</a>
-                <% if (voteButtonEnabled) { %>
-                    <a href="#!"
-                       onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id: '<%= ticket.id %>'}});">
-                        Votar (<%= votosDisp %>)
-                    </a>
-                <% } else { %>
-                    <span class="upper-text gray">Votar (0)</span>
-                <% } %>
-            </div>
-        </div>
-        <% } %>
-    </div>
+	<div class="col s12">
+		<!-- VOTE MESSAGE -->
+		<% if(!canVote) { %>
+			<p class="message red-text center-align">Mañana tendrá otro voto disponible</p>
+		<% } %>
 
-    <ul class="pagination">
-        <% var beforeActive = currentPage > 1; %>
-        <% var beforePageCls = beforeActive ? "waves-effect" : "disabled"; %>
-        <% var afterActive = currentPage < pages %>
-        <% var afterPageCls = afterActive ? "waves-effect" : "disabled"; %>
-        <li class="<%= beforePageCls %>"><a
-                    onclick="<%= beforeActive ? "apretaste.send({command: 'SUGERENCIAS', data: {page: '" + (currentPage - 1) + "'}})" : "" %>">
-                <i class="material-icons">chevron_left</i>
-            </a></li>
-        <% for(var page = 1; page <= pages; page++) { %>
-            <% var cls = page == currentPage ? "active" : "waves-effect" %>
-            <li class="<%= cls %>"
-                onclick="apretaste.send({command: 'SUGERENCIAS', data: {page: '<%= page %>'}})">
-                <a><%= page %></a>
-            </li>
-        <% } %>
-        <li class="<%= afterPageCls %>"><a
-                    onclick="<%= afterActive ? "apretaste.send({command: 'SUGERENCIAS', data: {page: '" + (currentPage + 1) + "'}})" : "" %>">
-                <i class="material-icons">chevron_right</i>
-            </a></li>
-    </ul>
+		<!-- LIST OF SUGESTIONS -->
+		<% tickets.forEach(function(ticket) { %>
+		<div class="card">
+			<div class="card-content">
+				<div class="row" style="margin-bottom:0px;">
+					<div class="col s2 m1">
+						<div class="person-avatar circle suggestion-avatar" face="<%= ticket.avatar %>" color="<%= ticket.avatarColor %>" size="42" onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= ticket.username %>'}})"></div>
+					</div>
+					<div class="col s10 m11">
+						<p class="grey-text">
+							<a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a>
+							&middot;
+							Expira el <%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
+						</p>
+
+						<p style="margin:5px 0px 15px 0px;"><%= ticket.text %></p>
+
+						<div class="progress" style="margin-bottom:0px;">
+							<div class="determinate" style="width: <%= ticket.percent %>%"></div>
+						</div>
+
+						<p class="green-text"><%= ticket.votes_count %> votos, <%= ticket.percent %>%</p>
+					</div>
+				</div>
+			</div>
+			<div class="card-action grey lighten-2">
+				<% if (canVote) { %>
+					<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VOTAR', data:{id:'<%= ticket.id %>'}});"><i class="tiny material-icons">thumb_up</i> Votar</a>
+				<% } %>
+				<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">Ver más</a>
+			</div>
+		</div>
+		<% }) %>
+	</div>
 </div>
 
-<div id="writeModal" class="container" status="closed" style="display: none;">
-    <div class="row">
-        <i class="material-icons small" onclick="toggleWriteModal()">close</i>
-        <div class="col s12">
-            <textarea id="note" class="materialize-textarea" maxlength="300" placeholder="Sugerencia"></textarea>
-        </div>
-        <div class="actions">
-            <i class="material-icons small pizarra-color-text right" onclick="sendNote()">send</i>
-        </div>
-    </div>
+<!-- PAGINATION -->
+<div class="row">
+	<div class="col s12 center-align">
+		<ul class="pagination">
+			<li class="waves-effect">
+				<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 - 1 %>'}})">
+					<i class="material-icons">chevron_left</i>
+				</a>
+			</li>
+			<li class="waves-effect"><%= page*1 + 1 %> / <%= pages %></li>
+			<li class="waves-effect">
+				<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 + 1 %>'}})">
+					<i class="material-icons">chevron_right</i>
+				</a>
+			</li>
+		</ul>
+	</div>
 </div>
 
-<% if(typeof dontShowFab == "undefined" || !dontShowFab){ %>
-    <div class="fixed-action-btn hide-on-share">
-        <a class="btn-floating btn-large waves-effect waves-light" href="#!" onclick="toggleWriteModal();"
-           id="createButton">
-            <i class="material-icons">comment</i>
-        </a>
-    </div>
-<% } %>
+<div class="bottom-space"></div>
 
+<!-- FLOATING BUTTON -->
+<div class="fixed-action-btn">
+	<a href="#newTicketModal" class="btn-floating btn-large waves-effect waves-light modal-trigger">
+		<i class="large material-icons">message</i>
+	</a>
+</div>
+
+<!-- MODAL NEW TICKET -->
+<div id="newTicketModal" class="modal bottom-sheet">
+	<div class="modal-content">
+		<div class="input-field">
+			<textarea id="message" class="materialize-textarea"></textarea>
+			<label for="message">Escriba su sugerencia</label>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="#!" class="modal-close waves-effect waves-light btn-flat">Cerrar</a>
+		<a onclick="sendMessage()" class="modal-close waves-effect waves-green btn-flat">Enviar</a>
+	</div>
+</div>
