@@ -125,7 +125,7 @@ class Service
 	public function _buscar(Request $request, Response $response)
 	{
 		$response->setCache('year');
-		$response->setTemplate('search.ejs', []);
+		$response->setTemplate('search.ejs', ['username'=>$request->person->username]);
 	}
 
 	/**
@@ -248,8 +248,15 @@ class Service
 		// get the suggestion
 		$suggestion = Database::queryFirst("SELECT * FROM _sugerencias_list WHERE id = $id");
 
+		// check if user already voted today
+		$alreadyVoted = Database::queryFirst("
+			SELECT COUNT(id) AS cnt 
+			FROM _sugerencias_votes 
+			WHERE person_id = {$request->person->id}
+			AND vote_date > CURRENT_DATE")->cnt > 0;
+
 		// do not continue if not ID was passed
-		if (empty($suggestion)) {
+		if (empty($suggestion) || $alreadyVoted) {
 			return $response->setTemplate('message.ejs', [
 				'header' => 'Votación fallida',
 				'icon' => 'sentiment_dissatisfied',

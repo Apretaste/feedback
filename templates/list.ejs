@@ -30,7 +30,7 @@
 							Expira el <%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
 						</p>
 
-						<p style="margin:5px 0px 15px 0px;"><%= ticket.text %></p>
+						<p class="card-text"><%= ticket.text %></p>
 
 						<div class="progress" style="margin-bottom:0px;">
 							<div class="determinate" style="width: <%= ticket.percent %>%"></div>
@@ -52,23 +52,25 @@
 </div>
 
 <!-- PAGINATION -->
-<div class="row">
-	<div class="col s12 center-align">
-		<ul class="pagination">
-			<li class="waves-effect">
-				<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 - 1 %>'}})">
-					<i class="material-icons">chevron_left</i>
-				</a>
-			</li>
-			<li class="waves-effect"><%= page*1 + 1 %> / <%= pages %></li>
-			<li class="waves-effect">
-				<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 + 1 %>'}})">
-					<i class="material-icons">chevron_right</i>
-				</a>
-			</li>
-		</ul>
+<% if(pages > 1) { %>
+	<div class="row">
+		<div class="col s12 center-align">
+			<ul class="pagination">
+				<li class="waves-effect">
+					<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 - 1 %>'}})">
+						<i class="material-icons">chevron_left</i>
+					</a>
+				</li>
+				<li class="waves-effect"><%= page*1 + 1 %> / <%= pages %></li>
+				<li class="waves-effect">
+					<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 + 1 %>'}})">
+						<i class="material-icons">chevron_right</i>
+					</a>
+				</li>
+			</ul>
+		</div>
 	</div>
-</div>
+<% } %>
 
 <div class="bottom-space"></div>
 

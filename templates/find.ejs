@@ -15,7 +15,7 @@
 							Expira el <%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
 						</p>
 
-						<p style="margin:5px 0px 15px 0px;"><%= ticket.text %></p>
+						<p class="card-text"><%= ticket.text %></p>
 
 						<div class="progress" style="margin-bottom:0px;">
 							<div class="determinate" style="width: <%= ticket.percent %>%"></div>

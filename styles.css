@@ -6,3 +6,8 @@
 .message {
 	margin-top: 0px;
 }
+
+.card-text {
+	margin: 5px 0px 15px 0px;
+	overflow: overlay;
+}
