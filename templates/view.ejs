@@ -18,7 +18,7 @@
 			<p class="green-text message"><%= suggestion.votes_count %> votos, <%= suggestion.percent %>%</p>
 		</div>
 
-		<p style="margin-bottom:20px;"><big><%= suggestion.text %></big></p>
+		<p class="card-text flow-text"><%= suggestion.text %></p>
 
 		<% if (canVote) { %>
 			<a class="waves-effect waves-light btn-small" href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id:'<%= suggestion.id %>'}})">
