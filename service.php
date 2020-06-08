@@ -29,6 +29,7 @@ class Service
 			INNER JOIN person B ON A.person_id = B.id 
 			WHERE A.limit_date > CURRENT_TIMESTAMP
 			AND A.votes_count < A.limit_votes
+			AND A.status = 'NEW'
 			ORDER BY A.votes_count DESC
 			LIMIT 20 OFFSET $offset");
 
@@ -50,7 +51,7 @@ class Service
 		}
 
 		// calculate the total number of pages
-		$rowsCount = Database::queryCache("SELECT COUNT(id) AS cnt FROM _sugerencias_list A WHERE A.limit_date > CURRENT_TIMESTAMP")[0]->cnt;
+		$rowsCount = Database::queryCache("SELECT COUNT(id) AS cnt FROM _sugerencias_list A WHERE A.status = 'NEW' AND A.limit_date > CURRENT_TIMESTAMP")[0]->cnt;
 		$pagesCount = ceil($rowsCount / 20);
 
 		// check if vote button can be enabled
@@ -85,7 +86,7 @@ class Service
 
 		// get the suggestion
 		$suggestion = Database::queryFirst("
-			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor 
+			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, A.status, B.username, B.avatar, B.avatarColor 
 			FROM _sugerencias_list A 
 			INNER JOIN person B 
 			ON A.person_id = B.id
@@ -103,6 +104,11 @@ class Service
 
 		// calculate percentage
 		$suggestion->percent = floor(($suggestion->votes_count * 100) / $suggestion->limit_votes);
+
+		// calculate label status
+		if($suggestion->status == "APPROVED") $suggestion->status = "Aprovada";
+		elseif($suggestion->status == "DISCARDED") $suggestion->status = "Rechazada";
+		else $suggestion->status = "Abierta";
 
 		// check if vote button can be enabled
 		$canVote = Database::queryFirst("
