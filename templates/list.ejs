@@ -26,8 +26,6 @@
 					<div class="col s10 m11">
 						<p class="grey-text">
 							<a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a>
-							&middot;
-							Expira el <%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
 						</p>
 
 						<p class="card-text"><%= ticket.text %></p>
@@ -36,7 +34,13 @@
 							<div class="determinate" style="width: <%= ticket.percent %>%"></div>
 						</div>
 
-						<p class="green-text"><%= ticket.votes_count %> votos, <%= ticket.percent %>%</p>
+						<p class="green-text">
+							<%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
+							&nbsp;&middot;&nbsp;
+							<%= ticket.votes_count %> votos
+							&nbsp;&middot;&nbsp;
+							<%= ticket.percent %>%
+						</p>
 					</div>
 				</div>
 			</div>
