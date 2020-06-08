@@ -51,7 +51,7 @@ class Service
 		}
 
 		// calculate the total number of pages
-		$rowsCount = Database::queryCache("SELECT COUNT(id) AS cnt FROM _sugerencias_list A WHERE A.status = 'NEW' AND A.limit_date > CURRENT_TIMESTAMP")[0]->cnt;
+		$rowsCount = Database::query("SELECT COUNT(id) AS cnt FROM _sugerencias_list A WHERE A.status = 'NEW' AND A.limit_date > CURRENT_TIMESTAMP")[0]->cnt;
 		$pagesCount = ceil($rowsCount / 20);
 
 		// check if vote button can be enabled
