@@ -217,8 +217,9 @@ class Service
 		$deadline = $fecha->modify('+15 days')->format('Y-m-d H:i:s');
 
 		// get the number of votes to approve the suggestion
-		$result = Database::queryCache("SELECT COUNT(id) AS cnt FROM person WHERE active=1", Database::CACHE_DAY);
-		$limitVotes = ceil($result[0]->cnt * 0.01);
+		$result = Database::queryCache("SELECT COUNT(id) AS cnt FROM person WHERE `status` = 'ACTIVE'", Database::CACHE_DAY);
+		$limitVotes = ceil($result[0]->cnt * 0.05);
+		if(empty($limitVotes)) $limitVotes = 10;
 
 		// insert a new suggestion
 		Database::query("
