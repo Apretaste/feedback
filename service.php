@@ -97,7 +97,7 @@ class Service
 		$suggestion->percent = floor(($suggestion->votes_count * 100) / $suggestion->limit_votes);
 
 		// calculate label status
-		if($suggestion->status == "APPROVED") $suggestion->status = "Aprovada";
+		if($suggestion->status == "APPROVED") $suggestion->status = "Aceptada";
 		elseif($suggestion->status == "DISCARDED") $suggestion->status = "Rechazada";
 		else $suggestion->status = "Abierta";
 
@@ -138,12 +138,6 @@ class Service
 		$status = empty($request->input->data->status) ? '' : $request->input->data->status;
 		$text = empty($request->input->data->text) ? '' : $request->input->data->text;
 
-		// get the right query based on status
-		$statusQuery = '';
-		if($status == 'OPEN') $statusQuery = "AND A.limit_date > CURRENT_TIMESTAMP AND A.votes_count < A.limit_votes";
-		elseif($status == 'DISCARDED') $statusQuery = "AND A.limit_date < CURRENT_TIMESTAMP AND A.votes_count < A.limit_votes";
-		elseif($status == 'APPROVED') $statusQuery = "AND A.limit_date <= CURRENT_TIMESTAMP AND A.votes_count >= A.limit_votes";
-
 		// get list of tickets
 		$tickets = Database::query("
 			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor, B.gender, B.online 
@@ -151,7 +145,7 @@ class Service
 			INNER JOIN person B ON A.person_id = B.id 
 			WHERE B.username LIKE '%$username%'
 			AND A.text LIKE '%$text%'
-			$statusQuery
+			AND A.status LIKE '%$status%'
 			ORDER BY A.votes_count DESC
 			LIMIT 20");
 
