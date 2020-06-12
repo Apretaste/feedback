@@ -1,3 +1,81 @@
+/* GLOBAL */
+
+.bottom-space {
+	margin-bottom: 80px;
+}
+
+.M {
+	color: #5c6bc0;
+}
+
+.F {
+	color: #ec407a;
+}
+
+.middle-center {
+	padding: 150px 40px 0px 40px;
+}
+
+/* CARDS */
+
+.card .card-person {
+	padding: 10px 16px;
+}
+
+.card .card-person .person-avatar {
+	margin: -5px 10px 0px 0px;
+}
+
+.card .flow-text {
+	margin: 5px 0px 15px 0px;
+	overflow: overlay;
+}
+
+/* NUMBERS LIST */
+
+.collection.number-list .collection-item {
+	padding-left: 50px;
+}
+
+.collection.number-list .number {
+	width: 30px !important;
+	height: 30px !important;
+	line-height: 30px !important;
+	top: 15px  !important;
+	left: 10px !important;
+	font-style: normal;
+}
+
+/* PROFILE COLLECTION */
+
+.collection.profile .avatar {
+	min-height: 63px;
+}
+
+.collection.profile .secondary-content i {
+	font-size: 30px;
+	line-height: 1.1;
+}
+
+.collection.profile .second {
+	right: 60px !important;
+}
+
+/* TAGS */
+
+.chip .icon {
+	float: left;
+	font-size: 16px;
+	line-height: 32px;
+	padding-right: 5px;
+}
+
+
+
+/* OTHER */
+
+
+
 .suggestion-avatar {
 	margin: auto;
 	margin-top: 10px;
@@ -7,7 +85,3 @@
 	margin-top: 0px;
 }
 
-.card-text {
-	margin: 5px 0px 15px 0px;
-	overflow: overlay;
-}

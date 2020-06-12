@@ -24,7 +24,7 @@ class Service
 
 		// get list of tickets
 		$tickets = Database::query("
-			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor 
+			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor, B.gender, B.online 
 			FROM _sugerencias_list A 
 			INNER JOIN person B ON A.person_id = B.id 
 			WHERE A.limit_date > CURRENT_TIMESTAMP
@@ -32,16 +32,6 @@ class Service
 			AND A.status = 'NEW'
 			ORDER BY A.votes_count DESC
 			LIMIT 20 OFFSET $offset");
-
-		// if not suggestion is registered
-		if (empty($tickets)) {
-			return $response->setTemplate('message.ejs', [
-				'header' => 'No hay sugerencias',
-				'icon' => 'sentiment_dissatisfied',
-				'text' => 'No encontramos ninguna sugerencia abierta. Puede añadir una sugerencia, o buscar alguna para votar.',
-				'button' => ['href' => 'SUGERENCIAS BUSCAR', 'caption' => 'Buscar']
-			]);
-		}
 
 		// calculate percentages
 		foreach ($tickets as $ticket) {
@@ -86,7 +76,7 @@ class Service
 
 		// get the suggestion
 		$suggestion = Database::queryFirst("
-			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, A.status, B.username, B.avatar, B.avatarColor 
+			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, A.status, B.username, B.avatar, B.avatarColor, B.gender, B.online, B.first_name
 			FROM _sugerencias_list A 
 			INNER JOIN person B 
 			ON A.person_id = B.id
@@ -98,7 +88,8 @@ class Service
 				'header' => 'Sugerencia no válida.',
 				'icon' => 'sentiment_dissatisfied',
 				'text' => 'No pudimos encontrar esta sugerencia. Es posible que esto sea un error, por favor intente nuevamente.',
-				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'btnLink' => 'SUGERENCIAS',
+				'btnCaption' => 'Ver sugerencias'
 			]);
 		}
 
@@ -119,7 +110,7 @@ class Service
 
 		// return response object
 		$response->setCache('hour');
-		$response->setTemplate('view.ejs', ['suggestion'=>$suggestion, 'canVote'=>$canVote]);
+		$response->setTemplate('view.ejs', ['item'=>$suggestion, 'canVote'=>$canVote]);
 	}
 
 	/**
@@ -155,7 +146,7 @@ class Service
 
 		// get list of tickets
 		$tickets = Database::query("
-			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor 
+			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor, B.gender, B.online 
 			FROM _sugerencias_list A 
 			INNER JOIN person B ON A.person_id = B.id 
 			WHERE B.username LIKE '%$username%'
@@ -170,7 +161,8 @@ class Service
 				'header' => 'No hay sugerencias',
 				'icon' => 'sentiment_dissatisfied',
 				'text' => 'No encontramos ninguna sugerencia que responda a dicha búsqueda. Por favor cambie sus parámetros de búsqueda e intente nuevamente.',
-				'button' => ['href' => 'SUGERENCIAS BUSCAR', 'caption' => 'Buscar sugerencias']
+				'btnLink' => 'SUGERENCIAS BUSCAR',
+				'btnCaption' => 'Buscar sugerencias'
 			]);
 		}
 
@@ -215,7 +207,8 @@ class Service
 				'header' => 'Sugerencia no válida.',
 				'icon' => 'sentiment_dissatisfied',
 				'text' => 'Esta sugerencia no se entiende. Por favor escribe una idea que tenga más de 20 caracteres y menos de 300',
-				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'btnLink' => 'SUGERENCIAS',
+				'btnCaption' => 'Ver sugerencias'
 			]);
 		}
 
@@ -237,7 +230,8 @@ class Service
 			'header' => 'Sugerencia recibida',
 			'icon' => 'thumb_up',
 			'text' => "Su sugerencia ha sido registrada satisfactoriamente y ya está visible para que otros voten. Cada usuario (incluido usted) podrá votar, y si llega a sumar {$limitVotes} votos en 15 días, será aprobada y todos ganarán créditos.",
-			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+			'btnLink' => 'SUGERENCIAS',
+			'btnCaption' => 'Ver sugerencias'
 		]);
 	}
 
@@ -267,7 +261,8 @@ class Service
 				'header' => 'Votación fallida',
 				'icon' => 'sentiment_dissatisfied',
 				'text' => "Hemos encontrado un error en la votacion, por favor busque dicha sugerencia e intente nuevamente",
-				'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+				'btnLink' => 'SUGERENCIAS',
+				'btnCaption' => 'Ver sugerencias'
 			]);
 		}
 
@@ -284,7 +279,8 @@ class Service
 			'header' => 'Voto enviado',
 			'icon' => 'thumb_up',
 			'text' => "Su voto ha sido registrado satisfactoriamente. Mañana tendrá otro voto disponible. ¡Gracias por ayudarnos a mejorar Apretaste!",
-			'button' => ['href' => 'SUGERENCIAS', 'caption' => 'Ver sugerencias']
+			'btnLink' => 'SUGERENCIAS ' . rand(),
+			'btnCaption' => 'Ver sugerencias'
 		]);
 	}
 }

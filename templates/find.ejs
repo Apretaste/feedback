@@ -1,38 +1,30 @@
 <div class="row">
 	<div class="col s12">
-		<!-- LIST OF SUGESTIONS -->
-		<% tickets.forEach(function(ticket) { %>
-		<div class="card">
-			<div class="card-content">
-				<div class="row" style="margin-bottom:0px;">
-					<div class="col s2 m1">
-						<div class="person-avatar circle suggestion-avatar" face="<%= ticket.avatar %>" color="<%= ticket.avatarColor %>" size="42" onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= ticket.username %>'}})"></div>
+		<% tickets.forEach(function(item) { %>
+			<div class="card">
+				<div class="card-person grey lighten-5">
+					<div class="person-avatar circle left" face="<%= item.avatar %>" color="<%= item.avatarColor %>" size="30" online="<%= item.online %>"></div>
+					<a href="#!" class="<%= item.gender %>" onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= item.username %>'}})">@<%= item.username %></a>
+				</div>
+				<div class="card-content">
+					<p class="flow-text"><%= item.text %></p>
+
+					<div class="progress" style="margin-bottom:0px;">
+						<div class="determinate" style="width: <%= item.percent %>%"></div>
 					</div>
-					<div class="col s10 m11">
-						<p class="grey-text">
-							<a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a>
-						</p>
 
-						<p class="card-text"><%= ticket.text %></p>
-
-						<div class="progress" style="margin-bottom:0px;">
-							<div class="determinate" style="width: <%= ticket.percent %>%"></div>
-						</div>
-
-						<p class="green-text">
-							<%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
-							&nbsp;&middot;&nbsp;
-							<%= ticket.votes_count %> votos
-							&nbsp;&middot;&nbsp;
-							<%= ticket.percent %>%
-						</p>
-					</div>
+					<p class="green-text" style="margin-top:0px;">
+						<%= moment(item.limit_date).format('DD/MM/YYYY') %>
+						&nbsp;&middot;&nbsp;
+						<%= item.votes_count %> votos
+						&nbsp;&middot;&nbsp;
+						<%= item.percent %>%
+					</p>
+				</div>
+				<div class="card-action grey lighten-4">
+					<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VER', data: {id: '<%= item.id %>'}});">Ver más</a>
 				</div>
 			</div>
-			<div class="card-action grey lighten-2">
-				<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">Ver más</a>
-			</div>
-		</div>
 		<% }) %>
 	</div>
 </div>

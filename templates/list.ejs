@@ -8,84 +8,86 @@
 	</div>
 </div>
 
-<div class="row">
-	<div class="col s12">
-		<!-- VOTE MESSAGE -->
-		<% if(!canVote) { %>
-			<p class="message red-text center-align">Mañana tendrá otro voto disponible</p>
-		<% } %>
+<!-- LIST OF SUGESTIONS -->
+<% if(tickets.length > 0) { %>
+	<div class="row">
+		<div class="col s12">
+			<!-- VOTE MESSAGE -->
+			<% if(!canVote) { %>
+				<p class="message red-text center-align">Mañana tendrá otro voto disponible</p>
+			<% } %>
 
-		<!-- LIST OF SUGESTIONS -->
-		<% tickets.forEach(function(ticket) { %>
-		<div class="card">
-			<div class="card-content">
-				<div class="row" style="margin-bottom:0px;">
-					<div class="col s2 m1">
-						<div class="person-avatar circle suggestion-avatar" face="<%= ticket.avatar %>" color="<%= ticket.avatarColor %>" size="42" onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= ticket.username %>'}})"></div>
+			<% tickets.forEach(function(item) { %>
+				<div class="card">
+					<div class="card-person grey lighten-5">
+						<div class="person-avatar circle left" face="<%= item.avatar %>" color="<%= item.avatarColor %>" size="30" online="<%= item.online %>"></div>
+						<a href="#!" class="<%= item.gender %>" onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= item.username %>'}})">@<%= item.username %></a>
 					</div>
-					<div class="col s10 m11">
-						<p class="grey-text">
-							<a href="#!" onclick="apretaste.send({command: 'PERFIL', data: {username: '<%= ticket.username %>'}});">@<%= ticket.username %></a>
-						</p>
-
-						<p class="card-text"><%= ticket.text %></p>
+					<div class="card-content">
+						<p class="flow-text"><%= item.text %></p>
 
 						<div class="progress" style="margin-bottom:0px;">
-							<div class="determinate" style="width: <%= ticket.percent %>%"></div>
+							<div class="determinate" style="width: <%= item.percent %>%"></div>
 						</div>
 
-						<p class="green-text">
-							<%= moment(ticket.limit_date).format('DD/MM/YYYY') %>
+						<p class="green-text" style="margin-top:0px;">
+							<%= moment(item.limit_date).format('DD/MM/YYYY') %>
 							&nbsp;&middot;&nbsp;
-							<%= ticket.votes_count %> votos
+							<%= item.votes_count %> votos
 							&nbsp;&middot;&nbsp;
-							<%= ticket.percent %>%
+							<%= item.percent %>%
 						</p>
 					</div>
+					<div class="card-action grey lighten-4">
+						<% if (canVote) { %>
+							<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VOTAR', data:{id:'<%= item.id %>'}});"><i class="tiny material-icons">thumb_up</i> Votar</a>
+						<% } %>
+						<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VER', data: {id: '<%= item.id %>'}});">Ver más</a>
+					</div>
 				</div>
-			</div>
-			<div class="card-action grey lighten-2">
-				<% if (canVote) { %>
-					<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VOTAR', data:{id:'<%= ticket.id %>'}});"><i class="tiny material-icons">thumb_up</i> Votar</a>
-				<% } %>
-				<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VER', data: {id: '<%= ticket.id %>'}});">Ver más</a>
+			<% }) %>
+		</div>
+	</div>
+
+	<!-- PAGINATION -->
+	<% if(pages > 1) { %>
+		<div class="row">
+			<div class="col s12 center-align">
+				<ul class="pagination">
+					<li class="waves-effect">
+						<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 - 1 %>'}})">
+							<i class="material-icons">chevron_left</i>
+						</a>
+					</li>
+					<li class="waves-effect"><%= page*1 + 1 %> / <%= pages %></li>
+					<li class="waves-effect">
+						<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 + 1 %>'}})">
+							<i class="material-icons">chevron_right</i>
+						</a>
+					</li>
+				</ul>
 			</div>
 		</div>
-		<% }) %>
-	</div>
-</div>
-
-<!-- PAGINATION -->
-<% if(pages > 1) { %>
+	<% } %>
+<% } else { %>
 	<div class="row">
-		<div class="col s12 center-align">
-			<ul class="pagination">
-				<li class="waves-effect">
-					<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 - 1 %>'}})">
-						<i class="material-icons">chevron_left</i>
-					</a>
-				</li>
-				<li class="waves-effect"><%= page*1 + 1 %> / <%= pages %></li>
-				<li class="waves-effect">
-					<a href="#!" onclick="apretaste.send({command:'SUGERENCIAS', data:{page:'<%= page*1 + 1 %>'}})">
-						<i class="material-icons">chevron_right</i>
-					</a>
-				</li>
-			</ul>
+		<div class="col s12 center">
+			<p class="middle-center grey-text">No encontramos ninguna sugerencia abierta. Puede añadir una sugerencia, o buscar alguna para votar.</p>
 		</div>
 	</div>
 <% } %>
 
+
 <div class="bottom-space"></div>
 
-<!-- FLOATING BUTTON -->
+<!-- MODAL BUTTON -->
 <div class="fixed-action-btn">
 	<a href="#newTicketModal" class="btn-floating btn-large waves-effect waves-light modal-trigger">
-		<i class="large material-icons">message</i>
+		<i class="large material-icons">add</i>
 	</a>
 </div>
 
-<!-- MODAL NEW TICKET -->
+<!-- MODAL -->
 <div id="newTicketModal" class="modal bottom-sheet">
 	<div class="modal-content">
 		<div class="input-field">
