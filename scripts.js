@@ -32,3 +32,49 @@ function startSearch() {
 		}
 	});
 }
+
+var share;
+
+function init(suggest) {
+	share = {
+		text: suggest.text.substr(0, 100),
+		icon: 'lightbulb',
+		send: function () {
+			apretaste.send({
+				command: 'PIZARRA PUBLICAR',
+				redirect: false,
+				callback: {
+					name: 'toast',
+					data: 'La sugerencia fue compartida en Pizarra'
+				},
+				data: {
+					text: $('#message').val(),
+					image: '',
+					link: {
+						command: btoa(JSON.stringify({
+							command: 'SUGERENCIAS VER',
+							data: {
+								id: item.id
+							}
+						})),
+						icon: share.icon,
+						text: share.text
+					}
+				}
+			})
+		}
+	};
+}
+
+function toast(message){
+	M.toast({html: message});
+}
+
+function removeTags(str) {
+	if ((str===null) || (str===''))
+		return '';
+	else
+		str = str.toString();
+
+	return str.replace( /(<([^>]+)>)/ig, '');
+}
