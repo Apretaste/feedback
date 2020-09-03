@@ -37,7 +37,7 @@ var share;
 
 function init(suggest) {
 	share = {
-		text: suggest.text.substr(0, 100),
+		text: suggest.text.substr(0, 50) + '...',
 		icon: 'lightbulb',
 		send: function () {
 			apretaste.send({
