@@ -4,7 +4,10 @@
 			<li class="collection-item avatar">
 				<div class="person-avatar circle left" face="<%= item.avatar %>" color="<%= item.avatarColor %>" size="45" online="<%= item.online %>"></div>
 				<span class="title <%= item.gender %>">@<%= item.username %></span>
-				<p><%= item.first_name %></p>
+				<br>
+				<span class="chip medium clear spacing"><i class="fas fa-bolt"></i> <%= item.experience %></span>
+				<span class="chip medium clear"><i class="fas fa-trophy"></i> <%= item.week_rank %></span>
+
 				<a href="#!" class="secondary-content green-text first" onclick="apretaste.send({'command':'PERFIL', 'data':{'username':'@<%= item.username %>'}})"><i class="material-icons">person</i></a>
 			</li>
 		</ul>
@@ -17,20 +20,16 @@
 			<div class="determinate" style="width: <%= item.percent %>%"></div>
 		</div>
 
-		<p class="green-text" style="margin-top:0px;">
-			<%= moment(item.limit_date).format('DD/MM/YYYY') %>
-			&nbsp;&middot;&nbsp;
-			<%= item.votes_count %> votos
-			&nbsp;&middot;&nbsp;
-			<%= item.percent %>%
-		</p>
+		<span class="chip tiny clear spacing"><i class="far fa-calendar"></i> <%= moment(item.limit_date).format('DD/MM/YYYY') %></span>
+		<span class="chip tiny clear spacing"><%= item.votes_count %> votos</span>
+		<span class="chip tiny clear"><%= item.percent %>%</span>
 
 		<p class="card-text flow-text"><%= item.text %></p>
 
 		<% if (item.status == 'Abierta') { %>
 			<% if (canVote) { %>
 				<a class="waves-effect waves-light btn-small" href="#!" onclick="apretaste.send({command: 'SUGERENCIAS VOTAR', data: {id:'<%= item.id %>'}})">
-					<i class="material-icons left">thumb_up</i> Votar
+					<i class="fas fa-thumbs-up"></i> Votar
 				</a>
 			<% } else { %>
 				<p class="red-text">Mañana tendrá otro voto disponible</p>
