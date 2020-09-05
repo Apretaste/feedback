@@ -41,7 +41,7 @@ var share;
 
 function init(suggest) {
 	share = {
-		text: teaser(suggest.text),
+		text: teaser("SUGERENCIA: " + suggest.text),
 		icon: 'lightbulb',
 		send: function () {
 			apretaste.send({
