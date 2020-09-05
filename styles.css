@@ -33,7 +33,7 @@
 
 /* NUMBERS LIST */
 
-.collection.number-list .collection-item {
+.f.number-list .collection-item {
 	padding-left: 50px;
 }
 
@@ -59,6 +59,13 @@
 
 .collection.profile .second {
 	right: 60px !important;
+}
+
+/* PREVIEW COLLECTION */
+
+.collection.preview {
+	margin: 20px 0px 0px 0px;
+	min-height: 65px;
 }
 
 /* TAGS */

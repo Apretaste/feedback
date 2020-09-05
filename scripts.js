@@ -33,11 +33,15 @@ function startSearch() {
 	});
 }
 
+function teaser(text) {
+	return text.length <= 50 ? text : text.substr(0, 50) + "...";
+}
+
 var share;
 
 function init(suggest) {
 	share = {
-		text: suggest.text.substr(0, 50) + '...',
+		text: teaser(suggest.text),
 		icon: 'lightbulb',
 		send: function () {
 			apretaste.send({
