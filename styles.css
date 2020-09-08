@@ -33,7 +33,7 @@
 
 /* NUMBERS LIST */
 
-.collection.number-list .collection-item {
+.f.number-list .collection-item {
 	padding-left: 50px;
 }
 
@@ -61,6 +61,13 @@
 	right: 60px !important;
 }
 
+/* PREVIEW COLLECTION */
+
+.collection.preview {
+	margin: 20px 0px 0px 0px;
+	min-height: 65px;
+}
+
 /* TAGS */
 
 .chip .icon {
@@ -85,3 +92,17 @@
 	margin-top: 0px;
 }
 
+.btn-floating.second {
+	margin-right: -10px;
+	width: 45px;
+	height: 45px;
+	line-height: 58px;
+}
+
+.btn-floating.third {
+	bottom: 45px;
+	left: 87px;
+	width: 45px;
+	height: 45px;
+	line-height: 58px;
+}
