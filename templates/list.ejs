@@ -30,17 +30,15 @@
 							<div class="determinate" style="width: <%= item.percent %>%"></div>
 						</div>
 
-						<p class="green-text" style="margin-top:0px;">
-							<%= moment(item.limit_date).format('DD/MM/YYYY') %>
-							&nbsp;&middot;&nbsp;
-							<%= item.votes_count %> votos
-							&nbsp;&middot;&nbsp;
-							<%= item.percent %>%
-						</p>
+						<span class="chip tiny clear spacing"><i class="far fa-calendar"></i> <%= moment(item.limit_date).format('DD/MM/YYYY') %></span>
+						<span class="chip tiny clear spacing"><%= item.votes_count %> votos</span>
+						<span class="chip tiny clear spacing"><%= item.percent %>%</span>
 					</div>
 					<div class="card-action grey lighten-4">
 						<% if (canVote) { %>
-							<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VOTAR', data:{id:'<%= item.id %>'}});"><i class="tiny material-icons">thumb_up</i> Votar</a>
+							<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VOTAR', data:{id:'<%= item.id %>'}});">
+								<i class="fas fa-thumbs-up"></i> Votar
+							</a>
 						<% } %>
 						<a href="#!" class="green-text" onclick="apretaste.send({command:'SUGERENCIAS VER', data: {id: '<%= item.id %>'}});">Ver más</a>
 					</div>
@@ -97,6 +95,6 @@
 	</div>
 	<div class="modal-footer">
 		<a href="#!" class="modal-close waves-effect waves-light btn-flat">Cerrar</a>
-		<a onclick="sendMessage()" class="modal-close waves-effect waves-green btn-flat">Enviar</a>
+		<a onclick="sendMessage()" class="modal-close waves-effect waves-green green-text btn-flat">Enviar</a>
 	</div>
 </div>

@@ -76,7 +76,10 @@ class Service
 
 		// get the suggestion
 		$suggestion = Database::queryFirst("
-			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, A.status, B.username, B.avatar, B.avatarColor, B.gender, B.online, B.first_name
+			SELECT 
+				A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, 
+				A.status, B.username, B.avatar, B.avatarColor, B.gender, 
+				B.online, B.first_name, B.experience, B.week_rank
 			FROM _sugerencias_list A 
 			INNER JOIN person B 
 			ON A.person_id = B.id
