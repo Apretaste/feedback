@@ -141,6 +141,10 @@ class Service
 		$status = empty($request->input->data->status) ? '' : $request->input->data->status;
 		$text = empty($request->input->data->text) ? '' : $request->input->data->text;
 
+		$username = Database::escape($username);
+		$status = Database::escape($status);
+		$text = Database::escape($text);
+
 		// get list of tickets
 		$tickets = Database::query("
 			SELECT A.id, A.text, A.votes_count, A.limit_votes, A.limit_date, B.username, B.avatar, B.avatarColor, B.gender, B.online 
