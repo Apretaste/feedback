@@ -222,6 +222,8 @@ class Service
 		$limitVotes = ceil($result[0]->cnt * 0.05);
 		if(empty($limitVotes)) $limitVotes = 10;
 
+		$message = Database::escape($message);
+
 		// insert a new suggestion
 		Database::query("
 			INSERT INTO _sugerencias_list (person_id, `text`, limit_votes, limit_date) 
