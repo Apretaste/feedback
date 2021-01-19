@@ -1,9 +1,10 @@
 <?php
 
 use Apretaste\Money;
-use Apretaste\Notifications;
 use Apretaste\Request;
 use Apretaste\Response;
+use Apretaste\Tutorial;
+use Apretaste\Notifications;
 use Framework\Database;
 
 class Service
@@ -222,12 +223,16 @@ class Service
 		$limitVotes = ceil($result[0]->cnt * 0.05);
 		if(empty($limitVotes)) $limitVotes = 10;
 
+		// escape message
 		$message = Database::escape($message);
 
 		// insert a new suggestion
 		Database::query("
 			INSERT INTO _sugerencias_list (person_id, `text`, limit_votes, limit_date) 
 			VALUES ({$request->person->id}, '$message', '$limitVotes', '$deadline')");
+
+		// complete tutorial
+		Tutorial::complete($request->person->id, 'leave_feedback');
 
 		// create response
 		$response->setTemplate('message.ejs', [
